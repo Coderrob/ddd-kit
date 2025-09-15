@@ -1,0 +1,11 @@
+export type { FixRecord } from './FixRecord';
+export type { ICommand } from './ICommand';
+export type { IExclusionFilter } from './IExclusionFilter';
+export type { IFixerOptions } from './IFixerOptions';
+export type { ILogger } from './ILogger';
+export type { ITaskFixer } from './ITaskFixer';
+export type { ITaskStore } from './ITaskStore';
+export type { ITaskValidator } from './ITaskValidator';
+export type { IValidationResultBuilder } from './IValidationResultBuilder';
+export type { IValidationResult } from './IValidationResult';
+export type { Task } from './Task';

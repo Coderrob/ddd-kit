@@ -1,0 +1,6 @@
+node_modules
+dist
+.docusaurus
+.coverage
+test/validator.test.js
+
