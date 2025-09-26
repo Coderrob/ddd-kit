@@ -1,4 +1,4 @@
-import { ICommand } from '../types';
+import { ICommand } from '../interfaces/ICommand';
 
 /**
  * Implementation of ICommand that executes a function.
@@ -13,7 +13,7 @@ export class FunctionCommand implements ICommand {
   constructor(
     public name: string, // eslint-disable-line no-unused-vars
     public description: string, // eslint-disable-line no-unused-vars
-    private fn: (args?: unknown) => Promise<void> | void, // eslint-disable-line no-unused-vars
+    private readonly fn: (args?: unknown) => Promise<void> | void, // eslint-disable-line no-unused-vars
   ) {}
 
   /**

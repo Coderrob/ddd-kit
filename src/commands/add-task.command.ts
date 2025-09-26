@@ -1,7 +1,8 @@
 import chalk from 'chalk';
-import { addTaskFromFile } from '../core';
-import { getLogger } from '../lib/logger';
-import { ICommand } from '../types';
+
+import { getLogger } from '../utils/logger';
+import { addTaskFromFile } from '../utils/todo';
+import { ICommand } from '../interfaces/ICommand';
 
 /**
  * Command for adding a new task from a file to the TODO.md.
@@ -14,14 +15,14 @@ export class AddTaskCommand implements ICommand {
    * Creates a new AddTaskCommand instance.
    * @param file - Optional file path containing the task to add. Can also be provided in execute args.
    */
-  constructor(private file?: string) {} // eslint-disable-line no-unused-vars
+  constructor(private readonly file?: string) {} // eslint-disable-line no-unused-vars
 
   /**
    * Executes the add task command.
    * Reads a task from a file and adds it to the TODO.md file.
    * @param args - Optional arguments containing the file path.
    */
-  async execute(args?: { file?: string }): Promise<void> {
+  execute(args?: { file?: string }): Promise<void> {
     const file = args?.file ?? this.file;
     try {
       const log = getLogger();
@@ -41,5 +42,6 @@ export class AddTaskCommand implements ICommand {
       console.error(chalk.red('Error adding task:'), msg || e);
       process.exitCode = 2;
     }
+    return Promise.resolve();
   }
 }

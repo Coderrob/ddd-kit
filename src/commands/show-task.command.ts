@@ -1,12 +1,18 @@
 import chalk from 'chalk';
-import { findTaskById } from '../core';
-import { getLogger } from '../lib/logger';
-import { ICommand } from '../types';
+
+import { findTaskById } from '../utils/todo';
+
+import { BaseCommand } from './base.command';
+
+interface TaskDetails {
+  detailed_requirements?: unknown;
+  validations?: unknown;
+}
 
 /**
  * Command for showing detailed information about a specific task.
  */
-export class ShowTaskCommand implements ICommand {
+export class ShowTaskCommand extends BaseCommand {
   name = 'todo:show';
   description = 'Show task';
 
@@ -14,43 +20,44 @@ export class ShowTaskCommand implements ICommand {
    * Creates a new ShowTaskCommand instance.
    * @param id - Optional task ID to show. Can also be provided in execute args.
    */
-  constructor(private id?: string) {} // eslint-disable-line no-unused-vars
+  constructor(private readonly id?: string) {
+    super();
+  }
 
   /**
    * Executes the show task command.
    * Displays detailed information about a task including its status, owner, requirements, and validations.
    * @param args - Optional arguments containing the task ID to show.
    */
-  async execute(args?: { id?: string }): Promise<void> {
-    const id = args?.id ?? this.id;
-    const log = getLogger();
-    if (!id) {
-      console.error(chalk.red('No id provided'));
-      return;
+  execute(args?: Record<string, unknown>): Promise<void> {
+    const id = args?.['id'] != null ? (args['id'] as string) : this['id'];
+    const log = this.logger;
+    if (id == null) {
+      this.logError('No id provided');
+      return Promise.resolve();
     }
     const task = findTaskById(id, log);
-    if (!task) {
-      console.error(chalk.red(`Task ${id} not found`));
+    if (task == null) {
+      this.logError(`Task ${id} not found`);
       process.exitCode = 2;
-      return;
+      return Promise.resolve();
     }
     log.info('showTaskCmd fetched task', { id });
-    console.log(chalk.bold(`${String(task.id)} — ${String(task.summary)}`));
-    console.log('Status:', String((task as Record<string, unknown>).status ?? ''));
-    console.log('Owner:', String((task as Record<string, unknown>).owner ?? 'Unassigned'));
-    console.log('\nDetailed requirements:');
+    this.logInfo(chalk.bold(`${String(task.id)} — ${String(task.title)}`));
+    this.logInfo(`Status: ${String(task.state ?? '')}`);
+    this.logInfo(`Owner: ${String(task.owner ?? 'Unassigned')}`);
+    this.logInfo('\nDetailed requirements:');
     try {
-      console.log(
-        JSON.stringify((task as Record<string, unknown>).detailed_requirements ?? {}, null, 2),
-      );
-    } catch (e) {
-      console.log('(invalid or missing detailed_requirements)');
+      this.logInfo(JSON.stringify((task as TaskDetails).detailed_requirements ?? {}, null, 2));
+    } catch {
+      this.logInfo('(invalid or missing detailed_requirements)');
     }
-    console.log('\nValidations:');
+    this.logInfo('\nValidations:');
     try {
-      console.log(JSON.stringify((task as Record<string, unknown>).validations ?? {}, null, 2));
-    } catch (e) {
-      console.log('(invalid or missing validations)');
+      this.logInfo(JSON.stringify((task as TaskDetails).validations ?? {}, null, 2));
+    } catch {
+      this.logInfo('(invalid or missing validations)');
     }
+    return Promise.resolve();
   }
 }

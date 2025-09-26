@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "traces": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "artifacts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "provenance": {
+            "type": "object",
+            "properties": {
+              "pipeline": {
+                "type": "string"
+              },
+              "dddctl": {
+                "type": "string"
+              },
+              "ddd-kit": {
+                "type": "string"
+              },
+              "resolved": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "required": ["taskId", "summary"]
+      }
+    }
+  },
+  "required": ["date", "entries"]
+}

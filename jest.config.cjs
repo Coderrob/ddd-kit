@@ -7,12 +7,14 @@ module.exports = {
     '<rootDir>/src/**/*.spec.ts',
     '<rootDir>/test/**/*.test.ts',
     '<rootDir>/test/**/*.spec.ts',
+    '<rootDir>/tools/**/*.test.ts',
+    '<rootDir>/tools/**/*.spec.ts',
   ],
   transform: {
     '^.+\\.tsx?$': [
       'ts-jest',
       {
-        tsconfig: 'tsconfig.spec.json',
+        tsconfig: 'tsconfig.test.json',
         useESM: false,
       },
     ],

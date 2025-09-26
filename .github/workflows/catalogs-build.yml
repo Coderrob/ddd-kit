@@ -1,0 +1,23 @@
+name: Build Catalogs
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'standards/**'
+      - 'tech/**'
+      - 'templates/**'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npm run build
+      - run: node tools/ci-scripts/build-catalogs.js
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'Update catalogs'
+          file_pattern: 'standards/catalogs/*.json'
