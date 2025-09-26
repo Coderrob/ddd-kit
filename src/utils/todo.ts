@@ -8,7 +8,7 @@ import { ITask } from '../interfaces/ITask';
 
 import { FileManager } from './file-manager';
 import { getLogger } from './logger';
-import { isNonEmptyString, safeGet } from './type-guards';
+import { isNullOrUndefined, isNonEmptyString, safeGet } from './type-guards';
 
 const ROOT = path.resolve(process.cwd());
 const TODO_PATH = path.join(ROOT, 'TODO.md');
@@ -50,7 +50,7 @@ function parseYamlBlock(block: string, logger?: ILogger): Record<string, unknown
   const log = logger ?? getLogger();
   try {
     const parsed = load(block);
-    if (parsed != null && typeof parsed === 'object') {
+    if (!isNullOrUndefined(parsed) && typeof parsed === 'object') {
       return parsed as Record<string, unknown>;
     }
   } catch (e) {
@@ -162,7 +162,7 @@ export function findTaskById(id: string, logger?: ILogger): ITask | null {
 export function previewComplete(id: string, logger?: ILogger): string {
   const log = logger ?? getLogger();
   const task = findTaskById(id, log);
-  if (task == null) return `Task ${id} not found`;
+  if (isNullOrUndefined(task)) return `Task ${id} not found`;
   const lines = [] as string[];
   lines.push(`Will remove task ${id} from TODO.md`);
   lines.push(`Will append to CHANGELOG.md Unreleased: ${task['id']} — ${task['summary']}`);

@@ -1,30 +1,44 @@
 import chalk from 'chalk';
+import { Command } from 'commander';
 
+import { ILogger } from '../interfaces/ILogger';
 import { listTasks } from '../utils/todo';
-
-import { BaseCommand } from './base.command';
+import { getLogger } from '../utils/logger';
 
 /**
- * Command for listing all tasks from the TODO.md file.
+ * Modern command for listing all tasks from the TODO.md file.
  */
-export class ListTasksCommand extends BaseCommand {
-  name = 'todo:list';
-  description = 'List tasks';
+export class ListTasksCommand {
+  constructor(private readonly logger: ILogger) {}
 
   /**
    * Executes the list tasks command.
    * Retrieves all tasks from TODO.md and displays them in a formatted list.
    */
   execute(): Promise<void> {
-    const log = this.logger;
-    const tasks = listTasks(log);
+    const tasks = listTasks(this.logger);
+
     if (!tasks.length) {
-      this.logInfo(chalk.yellow('No tasks found in TODO.md'));
+      console.log(chalk.yellow('No tasks found in TODO.md'));
+      this.logger.info('No tasks found in TODO.md');
       return Promise.resolve();
     }
-    for (const t of tasks) {
-      this.logInfo(`${chalk.cyan(t.id)}  ${t['priority'] ?? 'P2'}  ${t['summary'] ?? ''}`);
+
+    this.logger.info('Listed tasks', { taskCount: tasks.length });
+    for (const task of tasks) {
+      console.log(`${chalk.cyan(task.id)}  ${task['priority'] ?? 'P2'}  ${task['summary'] ?? ''}`);
     }
+
     return Promise.resolve();
+  }
+
+  static configure(parent: Command): void {
+    parent
+      .command('list')
+      .description('List all tasks')
+      .action(async () => {
+        const cmd = new ListTasksCommand(getLogger());
+        await cmd.execute();
+      });
   }
 }

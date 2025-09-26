@@ -4,87 +4,88 @@ import { ListTasksCommand } from '../commands/list-tasks.command';
 import { ShowTaskCommand } from '../commands/show-task.command';
 import { ValidateAndFixCommand } from '../commands/validate-and-fix.command';
 import { ValidateTasksCommand } from '../commands/validate-tasks.command';
-import { OutputFormat } from '../interfaces/OutputFormat';
+import { ILogger } from '../interfaces/ILogger';
+
+import { getLogger } from './logger';
 
 /**
- * Compatibility function for listing tasks.
- * Calls the new ListTasksCommand class internally.
+ * Command options interface for common command parameters.
  */
-export function listTasksCmd(): void {
-  new ListTasksCommand().execute();
+interface CommandOptions {
+  logger?: ILogger;
 }
 
 /**
- * Compatibility function for showing a task.
- * Calls the new ShowTaskCommand class internally.
- * @param id - The ID of the task to show.
+ * Modern compatibility function for listing tasks.
  */
-export function showTaskCmd(id: string): void {
-  new ShowTaskCommand().execute({ id });
+export function listTasksCmd(options: CommandOptions = {}): void {
+  const logger = options.logger ?? getLogger();
+  new ListTasksCommand(logger).execute();
 }
 
 /**
- * Compatibility function for completing a task.
- * Calls the new CompleteTaskCommand class internally.
- * @param id - The ID of the task to complete.
- * @param opts - Options for the completion including message and dry run flag.
+ * Modern compatibility function for showing a task.
  */
-export function completeTaskCmd(id: string, opts: { message?: string; dryRun?: boolean }): void {
-  new CompleteTaskCommand(id, opts).execute({ id, opts });
+export function showTaskCmd(id: string, options: CommandOptions = {}): void {
+  const logger = options.logger ?? getLogger();
+  new ShowTaskCommand(logger).execute({ id });
 }
 
 /**
- * Compatibility function for adding a task from a file.
- * Calls the new AddTaskCommand class internally.
- * @param file - The path to the file containing the task to add.
+ * Modern compatibility function for completing a task.
  */
-export function addTaskCmd(file: string): void {
-  new AddTaskCommand(file).execute({ file });
-}
-
-/**
- * Compatibility function for validating tasks.
- * Calls the new ValidateTasksCommand class internally.
- */
-export function validateTasksCmd(): void {
-  new ValidateTasksCommand().execute();
-}
-
-/**
- * Compatibility function for validating and fixing tasks.
- * Calls the new ValidateAndFixCommand class internally.
- * @param fix - Whether to apply fixes automatically.
- * @param dryRun - Whether to perform a dry run without making changes.
- * @param summary - Optional summary format configuration.
- * @param excludePattern - Optional pattern to exclude tasks from validation.
- */
-export function validateAndFixCmd(
-  fix: boolean,
-  dryRun: boolean,
-  summary?: { format?: OutputFormat },
-  excludePattern?: string,
+export function completeTaskCmd(
+  id: string,
+  opts: { message?: string; dryRun?: boolean } & CommandOptions = {},
 ): void {
-  const commandOptions: ConstructorParameters<typeof ValidateAndFixCommand>[0] = {
-    dryRun,
-    fix,
-  };
-  if (excludePattern != null) {
-    commandOptions.exclude = excludePattern;
-  }
-  if (summary != null) {
-    commandOptions.summary = summary;
-  }
+  const logger = opts.logger ?? getLogger();
+  new CompleteTaskCommand(logger).execute({ id }, opts);
+}
 
-  const executeOptions: Parameters<ValidateAndFixCommand['execute']>[0] = {
-    dryRun,
-    fix,
-  };
-  if (excludePattern != null) {
-    executeOptions.exclude = excludePattern;
-  }
-  if (summary != null) {
-    executeOptions.summary = summary;
-  }
+/**
+ * Modern compatibility function for adding a task from a file.
+ */
+export function addTaskCmd(file: string, options: CommandOptions = {}): void {
+  const logger = options.logger ?? getLogger();
+  new AddTaskCommand(logger).execute({ file });
+}
 
-  new ValidateAndFixCommand(commandOptions).execute(executeOptions);
+/**
+ * Modern compatibility function for validating tasks.
+ */
+export function validateTasksCmd(options: CommandOptions = {}): void {
+  const logger = options.logger ?? getLogger();
+  new ValidateTasksCommand(logger).execute();
+}
+
+/**
+ * Options for the validateAndFixCmd function.
+ */
+interface ValidateAndFixOptions extends CommandOptions {
+  fix: boolean;
+  dryRun: boolean;
+  format?: 'json' | 'csv';
+  excludePattern?: string;
+}
+
+/**
+ * Modern compatibility function for validating and fixing tasks.
+ */
+export function validateAndFixCmd(options: ValidateAndFixOptions): void {
+  const logger = options.logger ?? getLogger();
+  const commandOptions: {
+    dryRun: boolean;
+    exclude?: string;
+    fix: boolean;
+    format?: 'json' | 'csv';
+  } = {
+    dryRun: options.dryRun,
+    fix: options.fix,
+  };
+  if (typeof options.excludePattern === 'string' && options.excludePattern.length > 0) {
+    commandOptions.exclude = options.excludePattern;
+  }
+  if (options.format) commandOptions.format = options.format;
+
+  new ValidateAndFixCommand(logger).execute(commandOptions);
 }

@@ -1,8 +1,10 @@
 import chalk from 'chalk';
+import { Command } from 'commander';
 
+import { ILogger } from '../interfaces/ILogger';
 import { findTaskById } from '../utils/todo';
-
-import { BaseCommand } from './base.command';
+import { getLogger } from '../utils/logger';
+import { TodoShowCommandArgs } from '../interfaces/command-options';
 
 interface TaskDetails {
   detailed_requirements?: unknown;
@@ -10,54 +12,57 @@ interface TaskDetails {
 }
 
 /**
- * Command for showing detailed information about a specific task.
+ * Modern command for showing detailed information about a specific task.
  */
-export class ShowTaskCommand extends BaseCommand {
-  name = 'todo:show';
-  description = 'Show task';
-
-  /**
-   * Creates a new ShowTaskCommand instance.
-   * @param id - Optional task ID to show. Can also be provided in execute args.
-   */
-  constructor(private readonly id?: string) {
-    super();
-  }
+export class ShowTaskCommand {
+  constructor(private readonly logger: ILogger) {}
 
   /**
    * Executes the show task command.
    * Displays detailed information about a task including its status, owner, requirements, and validations.
-   * @param args - Optional arguments containing the task ID to show.
    */
-  execute(args?: Record<string, unknown>): Promise<void> {
-    const id = args?.['id'] != null ? (args['id'] as string) : this['id'];
-    const log = this.logger;
-    if (id == null) {
-      this.logError('No id provided');
-      return Promise.resolve();
-    }
-    const task = findTaskById(id, log);
-    if (task == null) {
-      this.logError(`Task ${id} not found`);
+  execute(args: TodoShowCommandArgs): Promise<void> {
+    const task = findTaskById(args.id, this.logger);
+
+    if (!task) {
+      console.error(chalk.red(`Task ${args.id} not found`));
+      this.logger.error('Task not found', { id: args.id });
       process.exitCode = 2;
       return Promise.resolve();
     }
-    log.info('showTaskCmd fetched task', { id });
-    this.logInfo(chalk.bold(`${String(task.id)} — ${String(task.title)}`));
-    this.logInfo(`Status: ${String(task.state ?? '')}`);
-    this.logInfo(`Owner: ${String(task.owner ?? 'Unassigned')}`);
-    this.logInfo('\nDetailed requirements:');
+
+    this.logger.info('Task details displayed', { id: args.id, title: task.title });
+    console.log(chalk.bold(`${task.id} — ${task.title ?? 'Untitled'}`));
+    console.log(`Status: ${task.state ?? 'Unknown'}`);
+    console.log(`Owner: ${task.owner ?? 'Unassigned'}`);
+    console.log('\nDetailed requirements:');
+
     try {
-      this.logInfo(JSON.stringify((task as TaskDetails).detailed_requirements ?? {}, null, 2));
+      console.log(JSON.stringify((task as TaskDetails).detailed_requirements ?? {}, null, 2));
     } catch {
-      this.logInfo('(invalid or missing detailed_requirements)');
+      console.log('(invalid or missing detailed_requirements)');
+      this.logger.warn('Invalid detailed_requirements in task', { id: args.id });
     }
-    this.logInfo('\nValidations:');
+
+    console.log('\nValidations:');
     try {
-      this.logInfo(JSON.stringify((task as TaskDetails).validations ?? {}, null, 2));
+      console.log(JSON.stringify((task as TaskDetails).validations ?? {}, null, 2));
     } catch {
-      this.logInfo('(invalid or missing validations)');
+      console.log('(invalid or missing validations)');
+      this.logger.warn('Invalid validations in task', { id: args.id });
     }
+
     return Promise.resolve();
+  }
+
+  static configure(parent: Command): void {
+    parent
+      .command('show')
+      .argument('<id>', 'Task ID to show')
+      .description('Show details of a specific task')
+      .action(async (id: string) => {
+        const cmd = new ShowTaskCommand(getLogger());
+        await cmd.execute({ id });
+      });
   }
 }

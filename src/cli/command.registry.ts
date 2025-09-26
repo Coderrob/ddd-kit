@@ -8,10 +8,10 @@ export class CommandRegistry {
 
   /**
    * Registers a command in the registry.
-   * @param cmd - The command to register.
+   * @param command - The command to register.
    */
-  register(cmd: ICommand): void {
-    this.commands.set(cmd.name, cmd);
+  register(command: ICommand): void {
+    this.commands.set(command.name, command);
   }
 
   /**

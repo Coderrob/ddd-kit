@@ -1,5 +1,7 @@
 import { IExclusionFilter } from '../interfaces/IExclusionFilter';
 
+import { isNullOrUndefined } from './type-guards';
+
 /**
  * Handles exclusion pattern matching for tasks.
  */
@@ -11,7 +13,9 @@ export class ExclusionFilter implements IExclusionFilter {
    * @param excludePattern - Optional glob-like pattern for excluding tasks (e.g., "T-001" or "*test*").
    */
   constructor(excludePattern?: string) {
-    this.excludeRegex = excludePattern != null ? this.createRegex(excludePattern) : null;
+    this.excludeRegex = !isNullOrUndefined(excludePattern)
+      ? this.createRegex(excludePattern)
+      : null;
   }
 
   /**

@@ -1,6 +1,7 @@
 import type { IReferenceAuditUseCase } from '../interfaces/IReferenceAuditUseCase';
 import type { IReferenceAuditResult } from '../interfaces/IReferenceAuditResult';
 import type { IResolver } from '../interfaces/IResolver';
+import { isNullOrUndefined } from '../utils/type-guards';
 
 export class ReferenceAuditService implements IReferenceAuditUseCase {
   constructor(private readonly resolver: IResolver) {}
@@ -16,7 +17,7 @@ export class ReferenceAuditService implements IReferenceAuditUseCase {
       // Safe object access since uid comes from for...in loop over registry keys
       // eslint-disable-next-line security/detect-object-injection
       const entry = registry[uid];
-      if (entry == null) {
+      if (isNullOrUndefined(entry)) {
         unresolvedUids.push(uid);
         continue;
       }

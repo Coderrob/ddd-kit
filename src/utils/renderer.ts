@@ -4,7 +4,7 @@ import type { IResolvedRef } from '../interfaces/ITask';
 import type { IRenderer } from '../interfaces/IRenderer';
 
 import { FileManager } from './file-manager';
-import { isNonEmptyString } from './type-guards';
+import { isNonEmptyString, isNullOrUndefined } from './type-guards';
 
 export class Renderer implements IRenderer {
   private readonly targetPath: string;
@@ -53,7 +53,7 @@ ${this.extractSection(ref.content, ref.section)}
   private extractSection(content: string, section?: string): string {
     // Strip front-matter
     const stripped = content.replace(/^---\n[\s\S]*?\n---\n/, '');
-    if (section == null) return stripped;
+    if (isNullOrUndefined(section)) return stripped;
     // Simple extraction, assume ## section
     const lines = stripped.split('\n');
     const start = lines.findIndex((l) => l.startsWith(`## ${section}`));

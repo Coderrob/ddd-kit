@@ -1,44 +1,23 @@
 import chalk from 'chalk';
+import { Command } from 'commander';
 
-import { ICommand } from '../interfaces/ICommand';
+import { ValidateFixCommandOptions } from '../interfaces/command-options';
 import { FixRecord } from '../interfaces/FixRecord';
+import { ILogger } from '../interfaces/ILogger';
 import { OutputFormat } from '../interfaces/OutputFormat';
+import { getLogger } from '../utils/logger';
 import { listTasks } from '../utils/todo';
 import { validateAndFixTasks } from '../validators/validator';
 
 /**
- * Command for validating tasks and optionally applying automatic fixes.
+ * Modern command for validating tasks and optionally applying automatic fixes.
  *
  * This command provides comprehensive task validation and automated fixing capabilities
  * for the DDD-Kit task management system. It can validate tasks against the schema,
  * apply automatic fixes for common issues, and provide detailed reporting in various formats.
  */
-export class ValidateAndFixCommand implements ICommand {
-  /** The command name used in the CLI */
-  name = 'todo:validate:fix';
-
-  /** Human-readable description of the command */
-  description = 'Validate and optionally fix tasks';
-
-  /**
-   * Creates a new ValidateAndFixCommand instance.
-   *
-   * @param options - Optional default configuration options for validation and fixing.
-   * @param options.fix - Whether to automatically apply fixes (default: false)
-   * @param options.dryRun - Whether to simulate fixes without actually applying them (default: false)
-   * @param options.summary - Output format configuration for fix summaries
-   * @param options.summary.format - The output format: 'json' for JSON output, 'csv' for CSV output
-   * @param options.exclude - Optional glob pattern to exclude certain tasks from validation/fixes
-   */
-  constructor(
-    private readonly options?: {
-      fix?: boolean;
-      dryRun?: boolean;
-      summary?: { format?: OutputFormat };
-      exclude?: string;
-    },
-  ) {}
-
+export class ValidateAndFixCommand {
+  constructor(private readonly logger: ILogger) {}
   /**
    * Executes the validate and fix command.
    *
@@ -59,40 +38,29 @@ export class ValidateAndFixCommand implements ICommand {
    *
    * @throws Will set process.exitCode to 5 if validation errors remain after fixing
    */
-  async execute(args?: {
-    fix?: boolean;
-    dryRun?: boolean;
-    summary?: { format?: OutputFormat };
-    exclude?: string;
-  }): Promise<void> {
-    const opts = args ?? this.options ?? {};
-
-    const res = await this.performValidation(opts);
-
-    this.handleValidationResult(opts, res);
+  async execute(options: ValidateFixCommandOptions = {}): Promise<void> {
+    const res = await this.performValidation(options);
+    this.handleValidationResult(options, res);
   }
 
   /**
    * Performs the validation and fixing operation.
    */
-  private performValidation(opts: { fix?: boolean; dryRun?: boolean; exclude?: string }) {
-    const options: Parameters<typeof validateAndFixTasks>[1] = {
-      applyFixes: Boolean(opts.fix) && opts.dryRun !== true,
+  private performValidation(options: ValidateFixCommandOptions) {
+    const validationOptions: Parameters<typeof validateAndFixTasks>[1] = {
+      applyFixes: Boolean(options.fix) && options.dryRun !== true,
     };
-    if (opts.exclude != null) {
-      options.excludePattern = opts.exclude;
+    if (typeof options.exclude === 'string' && options.exclude.length > 0) {
+      validationOptions.excludePattern = options.exclude;
     }
-    return validateAndFixTasks(listTasks(), options);
+    return validateAndFixTasks(listTasks(), validationOptions);
   }
 
   /**
    * Handles the validation result and produces output.
    */
   private handleValidationResult(
-    opts: {
-      summary?: { format?: OutputFormat };
-      dryRun?: boolean;
-    },
+    options: ValidateFixCommandOptions,
     res: {
       valid: boolean;
       errors?: string[];
@@ -101,14 +69,16 @@ export class ValidateAndFixCommand implements ICommand {
     },
   ): void {
     // Early return for successful validation with no fixes
-    if (res.valid && (res.fixesApplied == null || res.fixesApplied === 0)) {
-      console.log(chalk.green(`All ${listTasks().length} tasks validate against schema`));
+    if (res.valid && (res.fixesApplied ?? 0) === 0) {
+      const taskCount = listTasks().length;
+      console.log(chalk.green(`All ${taskCount} tasks validate against schema`));
+      this.logger.info('All tasks validated successfully', { taskCount });
       return;
     }
 
     // Output fixes if any exist
     if (res.fixes && res.fixes.length > 0) {
-      this.outputFixes(opts, { ...res, fixes: res.fixes });
+      this.outputFixes(options, { ...res, fixes: res.fixes });
     }
 
     // Handle validation errors
@@ -118,17 +88,22 @@ export class ValidateAndFixCommand implements ICommand {
     }
 
     // Output completion message
-    this.outputCompletionMessage(res.fixes, res.fixesApplied, opts.dryRun);
+    this.outputCompletionMessage(res.fixes, res.fixesApplied, options.dryRun);
   }
 
   /**
    * Outputs fixes based on the configured format.
    */
   private outputFixes(
-    opts: { summary?: { format?: OutputFormat }; dryRun?: boolean },
+    options: ValidateFixCommandOptions,
     res: { fixes: FixRecord[]; errors?: string[]; fixesApplied?: number },
   ): void {
-    const format = opts.summary?.format;
+    const format =
+      options.format === 'json'
+        ? OutputFormat.JSON
+        : options.format === 'csv'
+          ? OutputFormat.CSV
+          : null;
 
     if (format === OutputFormat.JSON) {
       this.outputJsonSummary(res.fixes, res.errors ?? []);
@@ -141,14 +116,19 @@ export class ValidateAndFixCommand implements ICommand {
     }
 
     // Default console output
-    this.outputConsoleSummary(res.fixes, res.fixesApplied, opts.dryRun);
+    this.outputConsoleSummary(res.fixes, res.fixesApplied, options.dryRun);
   }
 
   /**
    * Outputs validation results in JSON format.
    */
   private outputJsonSummary(fixes: FixRecord[], errors: string[]): void {
-    console.log(JSON.stringify({ errors, fixes }, null, 2));
+    const summary = { errors, fixes };
+    console.log(JSON.stringify(summary, null, 2));
+    this.logger.info('JSON summary generated', {
+      errorCount: errors.length,
+      fixCount: fixes.length,
+    });
   }
 
   /**
@@ -159,6 +139,7 @@ export class ValidateAndFixCommand implements ICommand {
     for (const f of fixes) {
       console.log(`"${f.id}","${f.field}","${String(f.old ?? '')}","${String(f.new)}"`);
     }
+    this.logger.info('CSV summary generated', { fixCount: fixes.length });
   }
 
   /**
@@ -172,9 +153,11 @@ export class ValidateAndFixCommand implements ICommand {
     if (isDryRun === true) {
       console.log(chalk.yellow(`Planned ${fixes.length} fixes (dry-run):`));
       for (const m of fixes) console.log(`- ${m.id}: ${m.field} -> ${m.new}`);
+      this.logger.info('Dry-run fixes displayed', { plannedFixes: fixes.length });
     } else {
       console.log(chalk.yellow(`Applied ${fixesApplied ?? 0} fixes:`));
       for (const m of fixes) console.log(`- ${m.id}: ${m.field} -> ${m.new}`);
+      this.logger.info('Applied fixes displayed', { appliedFixes: fixesApplied ?? 0 });
     }
   }
 
@@ -184,6 +167,7 @@ export class ValidateAndFixCommand implements ICommand {
   private handleValidationErrors(errors: string[]): void {
     console.error(chalk.red('Remaining validation errors:'));
     for (const e of errors) console.error(`- ${e}`);
+    this.logger.error('Validation errors remain after fixes', { errorCount: errors.length });
     process.exitCode = 5;
   }
 
@@ -196,13 +180,27 @@ export class ValidateAndFixCommand implements ICommand {
     isDryRun: boolean | undefined,
   ): void {
     if (isDryRun === true) {
-      console.log(
-        chalk.green(`Dry-run complete; ${fixes?.length ?? 0} fixes would have been applied.`),
-      );
+      const plannedFixes = fixes?.length ?? 0;
+      console.log(chalk.green(`Dry-run complete; ${plannedFixes} fixes would have been applied.`));
+      this.logger.info('Dry-run completed', { plannedFixes });
     } else {
-      console.log(
-        chalk.green(`Validation and fixes completed; ${fixesApplied ?? 0} changes written.`),
-      );
+      const appliedFixes = fixesApplied ?? 0;
+      console.log(chalk.green(`Validation and fixes completed; ${appliedFixes} changes written.`));
+      this.logger.info('Validation and fixes completed', { appliedFixes });
     }
+  }
+
+  static configure(parent: Command): void {
+    parent
+      .command('fix')
+      .description('Validate and fix tasks')
+      .option('--fix', 'Apply fixes automatically')
+      .option('--dry-run', 'Perform dry run without making changes')
+      .option('--format <format>', 'Output format: json, csv', 'json')
+      .option('--exclude <pattern>', 'Pattern to exclude tasks')
+      .action(async (options: ValidateFixCommandOptions) => {
+        const cmd = new ValidateAndFixCommand(getLogger());
+        await cmd.execute(options);
+      });
   }
 }

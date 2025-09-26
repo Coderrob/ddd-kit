@@ -45,6 +45,20 @@ export function isNonEmptyArray<T>(value: unknown): value is T[] {
 }
 
 /**
+ * Type guard to check if a value is null
+ */
+export function isNull(value: unknown): value is null {
+  return value === null;
+}
+
+/**
+ * Type guard to check if a value is null or undefined
+ */
+export function isNullOrUndefined(value: unknown): value is null | undefined {
+  return value === null || typeof value === 'undefined';
+}
+
+/**
  * Safe property accessor for objects with index signatures
  */
 export function safeGet<T = unknown>(
@@ -54,6 +68,7 @@ export function safeGet<T = unknown>(
   if (!isObject(obj)) {
     return void 0;
   }
+  // eslint-disable-next-line security/detect-object-injection
   return obj[key] as T | undefined;
 }
 
@@ -76,6 +91,7 @@ export function safeGetRequired<T = unknown>(
  * Safe environment variable accessor
  */
 export function safeEnv(key: string, defaultValue?: string): string {
+  // eslint-disable-next-line security/detect-object-injection
   const value = process.env[key];
   if (isNonEmptyString(value)) {
     return value;
@@ -90,6 +106,7 @@ export function safeEnv(key: string, defaultValue?: string): string {
  * Safe environment variable accessor that returns undefined if not set
  */
 export function safeEnvOptional(key: string): string | undefined {
+  // eslint-disable-next-line security/detect-object-injection
   const value = process.env[key];
   return isNonEmptyString(value) ? value : void 0;
 }

@@ -5,6 +5,8 @@ import { ITaskStore } from '../interfaces/ITaskStore';
 import { ILogger } from '../interfaces/ILogger';
 import { FixRecord } from '../interfaces/FixRecord';
 import { TaskValidationService } from '../services/task-validation.service';
+import { ITask } from '../interfaces/ITask';
+import { isNullOrUndefined } from '../utils/type-guards';
 
 import { SchemaLoader } from './schema-loader';
 import { AjvValidator } from './ajv-validator';
@@ -24,7 +26,7 @@ addFormats(ajv);
  *   - valid: boolean indicating if all tasks passed validation
  *   - errors: array of error messages (only present if valid is false)
  */
-export function validateTasks(tasks: unknown[]): { valid: boolean; errors?: string[] } {
+export function validateTasks(tasks: ITask[]): { valid: boolean; errors?: string[] } {
   const loader = new SchemaLoader();
   const validator = new AjvValidator(loader);
   const errors: string[] = [];
@@ -85,13 +87,13 @@ export async function validateAndFixTasks(
   const returnValue = {
     valid: result.valid,
   } as { valid: boolean; errors?: string[]; fixesApplied?: number; fixes?: FixRecord[] };
-  if (result.errors != null) {
+  if (!isNullOrUndefined(result.errors)) {
     returnValue.errors = result.errors;
   }
-  if (result.fixesApplied != null) {
+  if (!isNullOrUndefined(result.fixesApplied)) {
     returnValue.fixesApplied = result.fixesApplied;
   }
-  if (result.fixes != null) {
+  if (!isNullOrUndefined(result.fixes)) {
     returnValue.fixes = result.fixes;
   }
   return returnValue;

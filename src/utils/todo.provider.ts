@@ -2,6 +2,7 @@ import { ITask } from '../interfaces/ITask';
 import { ITaskRepository } from '../interfaces/ITaskRepository';
 
 import { listTasks, updateTaskById } from './todo';
+import { isNullOrUndefined } from './type-guards';
 
 export class TodoProvider implements ITaskRepository {
   findById(id: string): Promise<ITask | null> {
@@ -18,7 +19,7 @@ export class TodoProvider implements ITaskRepository {
       (t) =>
         typeof t === 'object' &&
         typeof (t as Record<string, unknown>)['id'] === 'string' &&
-        ((t as Record<string, unknown>)['state'] == null ||
+        (isNullOrUndefined((t as Record<string, unknown>)['state']) ||
           (t as Record<string, unknown>)['state'] === 'pending'),
     );
     // Apply filters if any
