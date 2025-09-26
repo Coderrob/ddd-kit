@@ -22,7 +22,13 @@ module.exports = {
     node: true,
     es6: true,
   },
-  ignorePatterns: ['*.config.js', '*.config.ts', 'webpack.config.js', 'webpack.config.ts', 'tools/ci-scripts/**/*'],
+  ignorePatterns: [
+    '*.config.js',
+    '*.config.ts',
+    'webpack.config.js',
+    'webpack.config.ts',
+    'tools/ci-scripts/**/*',
+  ],
   rules: {
     // Prettier integration
     'prettier/prettier': 'error',
