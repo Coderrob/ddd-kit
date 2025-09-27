@@ -1,11 +1,12 @@
-import type { ITaskRenderUseCase } from '../interfaces/ITaskRenderUseCase';
-import { TaskProviderFactory } from '../utils/task-provider.factory';
-import { hydrateTask } from '../utils/task-hydration';
-import type { IRenderOptions } from '../interfaces/ITask';
+import type { ITaskRenderUseCase } from '../types/ITaskRenderUseCase';
+import { TaskProviderType } from '../types';
+import { TaskProviderFactory } from '../core/storage/task-provider.factory';
+import { hydrateTask } from '../core/processing/task-hydration';
+import type { IRenderOptions } from '../types/ITask';
 
 export class TaskRenderService implements ITaskRenderUseCase {
   async execute(taskId: string, options: IRenderOptions): Promise<void> {
-    const provider = TaskProviderFactory.create('todo');
+    const provider = TaskProviderFactory.create(TaskProviderType.TODO);
     const task = await provider.findById(taskId);
     if (!task) throw new Error(`Task ${taskId} not found`);
 

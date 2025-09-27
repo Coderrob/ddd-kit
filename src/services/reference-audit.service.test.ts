@@ -1,4 +1,4 @@
-import type { IResolver } from '../interfaces/IResolver';
+import type { IResolver } from '../types/IResolver';
 
 import { ReferenceAuditService } from './reference-audit.service';
 

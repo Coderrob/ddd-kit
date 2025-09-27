@@ -1,5 +1,5 @@
-import type { IUIdSupersedeUseCase } from '../interfaces/IUIdSupersedeUseCase';
-import type { IResolver } from '../interfaces/IResolver';
+import type { IUIdSupersedeUseCase } from '../types/IUIdSupersedeUseCase';
+import type { IResolver } from '../types/IResolver';
 
 export class UidSupersedeService implements IUIdSupersedeUseCase {
   constructor(private readonly resolver: IResolver) {}

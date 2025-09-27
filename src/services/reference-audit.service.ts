@@ -1,7 +1,7 @@
-import type { IReferenceAuditUseCase } from '../interfaces/IReferenceAuditUseCase';
-import type { IReferenceAuditResult } from '../interfaces/IReferenceAuditResult';
-import type { IResolver } from '../interfaces/IResolver';
-import { isNullOrUndefined } from '../utils/type-guards';
+import type { IReferenceAuditUseCase } from '../types/IReferenceAuditUseCase';
+import type { IReferenceAuditResult } from '../types/IReferenceAuditResult';
+import type { IResolver } from '../types/IResolver';
+import { isNullOrUndefined } from '../core/helpers/type-guards';
 
 export class ReferenceAuditService implements IReferenceAuditUseCase {
   constructor(private readonly resolver: IResolver) {}

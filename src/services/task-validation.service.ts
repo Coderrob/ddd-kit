@@ -1,6 +1,6 @@
-import { ILogger } from '../interfaces/ILogger';
-import { ITaskStore } from '../interfaces/ITaskStore';
-import { TaskProcessor } from '../utils/task.processor';
+import { ILogger } from '../types/ILogger';
+import { ITaskStore } from '../types/ITaskStore';
+import { TaskProcessor } from '../core/processing/task.processor';
 import { ValidationContext } from '../validators/validation.context';
 import { ValidationFactory } from '../validators/validation.factory';
 import { ValidationResult } from '../validators/validation.result';

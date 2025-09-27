@@ -1,8 +1,8 @@
-import { DefaultTaskStore } from '../utils/default-task.store';
+import { DefaultTaskStore } from '../core/storage/default-task.store';
 
 import { validateAndFixTasks } from './validator';
 
-jest.mock('../utils/default-task.store');
+jest.mock('../core/storage/default-task.store');
 
 describe('validator module', () => {
   const mockUpdateTaskById = jest.fn();

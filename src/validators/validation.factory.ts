@@ -1,14 +1,14 @@
-import { ITaskValidator } from '../interfaces/ITaskValidator';
-import { ILogger } from '../interfaces/ILogger';
-import { ITaskFixer } from '../interfaces/ITaskFixer';
-import { IExclusionFilter } from '../interfaces/IExclusionFilter';
-import { IValidationResultBuilder } from '../interfaces/IValidationResultBuilder';
-import { TaskFixer } from '../utils/task-fixer';
-import { ExclusionFilter } from '../utils/exclusion.filter';
+import { ITaskValidator } from '../types/ITaskValidator';
+import { ILogger } from '../types/ILogger';
+import { ITaskFixer } from '../types/ITaskFixer';
+import { IExclusionFilter } from '../types/IExclusionFilter';
+import { IValidationResultBuilder } from '../types/IValidationResultBuilder';
+import { TaskFixer } from '../core/processing/task-fixer';
+import { ExclusionFilter } from '../core/processing/exclusion.filter';
 
-import { SchemaLoader } from './schema-loader';
+import { SchemaLoader } from './schema.loader';
 import { ValidationResultBuilder } from './validation-result.builder';
-import { AjvValidator } from './ajv-validator';
+import { AjvValidator } from './ajv.validator';
 
 /**
  * Factory for creating validation dependencies.

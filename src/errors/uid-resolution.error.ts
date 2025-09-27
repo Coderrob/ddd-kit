@@ -1,4 +1,4 @@
-import { isNullOrUndefined } from '../utils/type-guards';
+import { isNullOrUndefined } from '../core/helpers/type-guards';
 
 import { DomainError } from './domain.error';
 

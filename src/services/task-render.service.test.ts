@@ -1,11 +1,12 @@
-import { TaskProviderFactory } from '../utils/task-provider.factory';
-import { hydrateTask } from '../utils/task-hydration';
-import type { IRenderOptions } from '../interfaces/ITask';
+import { TaskProviderType } from '../types';
+import { TaskProviderFactory } from '../core/storage/task-provider.factory';
+import { hydrateTask } from '../core/processing/task-hydration';
+import type { IRenderOptions } from '../types/ITask';
 
 import { TaskRenderService } from './task-render.service';
 
-jest.mock('../utils/task-provider.factory');
-jest.mock('../utils/task-hydration');
+jest.mock('../core/storage/task-provider.factory');
+jest.mock('../core/processing/task-hydration');
 
 describe('TaskRenderService', () => {
   let service: TaskRenderService;
@@ -26,7 +27,7 @@ describe('TaskRenderService', () => {
 
     await service.execute('test-task', {} as IRenderOptions);
 
-    expect(TaskProviderFactory.create).toHaveBeenCalledWith('todo');
+    expect(TaskProviderFactory.create).toHaveBeenCalledWith(TaskProviderType.TODO);
     expect(mockProvider.findById).toHaveBeenCalledWith('test-task');
     expect(hydrateTask).toHaveBeenCalledWith(task, '.', '.', void 0);
   });

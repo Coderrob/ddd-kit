@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
 
-import { getLogger } from '../utils/logger';
-
-import { CommandFactory } from './command.factory';
+import { getLogger } from '../core/system/logger';
+import { CommandFactory } from '../commands/shared/command.factory';
 
 /**
  * Main CLI entry point for the Documentation-Driven Development toolkit.
@@ -17,19 +16,19 @@ import { CommandFactory } from './command.factory';
 const program = new Command();
 program.name('dddctl').description('Documentation-Driven Development CLI').version('1.0.0');
 
+// Create logger for command configuration
+const logger = getLogger();
+
 // Configure all commands through the factory
-CommandFactory.configureProgram(program);
+CommandFactory.configureProgram(program, logger);
 
 // Error handling following clean architecture principles
 try {
-  const logger = getLogger();
   logger.debug('CLI start', { argv: process.argv.slice(2) });
 
   // Parse command line arguments and execute the appropriate command
   program.parse(process.argv);
 } catch (error) {
-  const logger = getLogger();
-
   // Log domain errors with appropriate level
   if (error instanceof Error && 'code' in error) {
     logger.error('Domain error occurred', {

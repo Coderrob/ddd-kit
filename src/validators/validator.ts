@@ -1,15 +1,15 @@
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 
-import { ITaskStore } from '../interfaces/ITaskStore';
-import { ILogger } from '../interfaces/ILogger';
-import { FixRecord } from '../interfaces/FixRecord';
+import { ITaskStore } from '../types/ITaskStore';
+import { ILogger } from '../types/ILogger';
+import { FixRecord } from '../types/FixRecord';
 import { TaskValidationService } from '../services/task-validation.service';
-import { ITask } from '../interfaces/ITask';
-import { isNullOrUndefined } from '../utils/type-guards';
+import { ITask } from '../types/ITask';
+import { isNullOrUndefined } from '../core/helpers/type-guards';
 
-import { SchemaLoader } from './schema-loader';
-import { AjvValidator } from './ajv-validator';
+import { SchemaLoader } from './schema.loader';
+import { AjvValidator } from './ajv.validator';
 
 const ajv = new Ajv({ allErrors: true, strict: false });
 addFormats(ajv);

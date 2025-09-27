@@ -1,5 +1,5 @@
-import type { FixRecord } from '../interfaces/FixRecord';
-import type { IValidationResult } from '../interfaces/IValidationResult';
+import type { FixRecord } from '../types/FixRecord';
+import type { IValidationResult } from '../types/IValidationResult';
 
 import { ValidationResultBuilder } from './validation-result.builder';
 
