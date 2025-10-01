@@ -4,7 +4,7 @@ import { Command } from 'commander';
 import { CompleteTaskArgs, CompleteTaskOptions } from '../../types/tasks';
 import { ILogger } from '../../types/observability';
 import { EXIT_CODES } from '../../constants/exit-codes';
-import { TodoManager } from '../../core/storage/todo';
+import { TaskManager } from '../../core/storage/task.manager';
 import { CommandName, ICommand } from '../../types';
 
 /**
@@ -21,7 +21,7 @@ export class CompleteTaskCommand implements ICommand {
    * Removes the task from TODO.md and adds an entry to CHANGELOG.md.
    */
   execute(args: CompleteTaskArgs, options: CompleteTaskOptions = {}): Promise<void> {
-    const todoManager = new TodoManager(this.logger);
+    const todoManager = new TaskManager(this.logger);
     const task = todoManager.findTaskById(args.id);
 
     if (!task) {
@@ -54,7 +54,7 @@ export class CompleteTaskCommand implements ICommand {
   private performTaskCompletion(
     id: string,
     changelogEntry: string,
-    todoManager: TodoManager,
+    todoManager: TaskManager,
   ): void {
     const removed = todoManager.removeTaskById(id);
     if (removed !== true) {

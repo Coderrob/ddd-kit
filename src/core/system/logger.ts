@@ -1,5 +1,3 @@
-import pino from 'pino';
-
 import { ILogger } from '../../types/observability';
 
 import { PinoLogger } from './pino.logger';
@@ -29,7 +27,7 @@ export function getLogger(): ILogger {
       process.argv[1]?.endsWith('cli.ts') === true ||
       process.env['NODE_ENV'] === 'cli' ||
       !process.stdout.isTTY;
-    globalLogger = new PinoLogger(pino(), isCli);
+    globalLogger = PinoLogger.createDefaultLogger({ isCli });
   }
   return globalLogger as ILogger;
 }
@@ -54,44 +52,4 @@ export function getLogger(): ILogger {
  */
 export function setLogger(logger: ILogger): void {
   globalLogger = logger;
-}
-
-/**
- * Creates a new Pino-based logger instance.
- *
- * Factory function for creating Pino logger instances with optional configuration.
- * Supports both CLI and programmatic usage modes with appropriate output formatting.
- *
- * @param opts - Optional Pino logger configuration options (level, serializers, etc.)
- * @param isCli - Whether to configure for CLI usage with pretty-printed output (true) or JSON output (false)
- * @returns A new ILogger instance using Pino with the specified configuration
- *
- * @example
- * ```typescript
- * // Create a JSON logger for production
- * const prodLogger = createPinoLogger({ level: 'warn' }, false);
- *
- * // Create a pretty-printed CLI logger
- * const cliLogger = createPinoLogger({ level: 'debug' }, true);
- * ```
- */
-export function createPinoLogger(opts?: pino.LoggerOptions, isCli?: boolean): ILogger {
-  if (isCli === true) {
-    const logger = pino({
-      ...opts,
-      transport: {
-        options: {
-          colorize: true,
-          ignore: 'pid,hostname',
-          messageFormat: '{msg}',
-          translateTime: 'SYS:HH:MM:ss',
-        },
-        target: 'pino-pretty',
-      },
-    });
-    return new PinoLogger(logger, true);
-  }
-
-  const logger = pino(opts ?? { level: process.env['LOG_LEVEL'] ?? 'info' });
-  return new PinoLogger(logger, false);
 }

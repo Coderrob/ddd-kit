@@ -3,6 +3,7 @@ import { randomUUID } from 'crypto';
 import pino from 'pino';
 
 import { IObservabilityLogger } from '../../types/observability';
+import { formatJson } from '../parsers/json.parser';
 
 /**
  * Enhanced Pino-based logger with comprehensive observability features.
@@ -94,11 +95,11 @@ export class ObservabilityLogger implements IObservabilityLogger {
     );
 
     // Store for potential aggregation
-    this.metrics.set(`${name}_${JSON.stringify(labels)}`, value);
+    this.metrics.set(`${name}_${formatJson(labels)}`, value);
   }
 
   counter(name: string, labels: Record<string, string> = {}, increment: number = 1): void {
-    const key = `${name}_${JSON.stringify(labels)}`;
+    const key = `${name}_${formatJson(labels)}`;
     const currentValue = this.metrics.get(key) ?? 0;
     const newValue = currentValue + increment;
     this.metrics.set(key, newValue);

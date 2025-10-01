@@ -1,11 +1,11 @@
 /**
  * GitHub Projects v2 API types for type safety
  */
-export interface GitHubProjectUser {
+interface GitHubProjectUser {
   login: string;
 }
 
-export interface GitHubProjectLabel {
+interface GitHubProjectLabel {
   name: string;
 }
 
@@ -28,7 +28,7 @@ export interface GitHubProjectIssue {
   };
 }
 
-export interface ProjectV2FieldValue {
+interface ProjectV2FieldValue {
   field?: { name: string };
   text?: string;
   name?: string;
@@ -42,17 +42,17 @@ export interface ProjectV2Item {
   };
 }
 
-export interface ProjectV2Response {
+interface ProjectV2Response {
   items?: {
     nodes: ProjectV2Item[];
   };
 }
 
-export interface ProjectV2User {
+interface ProjectV2User {
   projectV2?: ProjectV2Response;
 }
 
-export interface GraphQLData {
+interface GraphQLData {
   node?: ProjectV2Item;
   user?: ProjectV2User;
 }
@@ -60,10 +60,6 @@ export interface GraphQLData {
 export interface GraphQLResponse {
   data?: GraphQLData;
   errors?: Array<{ message: string }>;
-}
-
-export function isProjectV2Item(value: unknown): value is ProjectV2Item {
-  return typeof value === 'object' && value !== null && 'id' in value;
 }
 
 export function hasContent(

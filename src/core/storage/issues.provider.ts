@@ -1,6 +1,7 @@
 import { ITask, TaskState, TaskStatus } from '../../types/tasks';
 import { ITaskRepository } from '../../types/repository';
 import { ILogger } from '../../types/observability';
+import { formatJson } from '../parsers/json.parser';
 
 import { GitHubLabel, isGitHubIssue } from './github.types';
 
@@ -126,7 +127,7 @@ export class IssuesProvider implements ITaskRepository {
       };
 
       const response = await this.fetchFromGitHub(`/repos/${this.githubRepo}/issues/${task.id}`, {
-        body: JSON.stringify(updateData),
+        body: formatJson(updateData),
         method: 'PATCH',
       });
 

@@ -12,7 +12,7 @@ import { isNonEmptyString, isObject } from '../helpers/type-guards';
  * @param md - The markdown content to parse.
  * @returns An array of YAML block contents.
  */
-export function extractYamlBlocks(md: string): string[] {
+function extractYamlBlocks(md: string): string[] {
   const blocks: string[] = [];
   const pattern = /---\r?\n([\s\S]*?)\r?\n---/g;
   let match: RegExpExecArray | null;
@@ -30,7 +30,7 @@ export function extractYamlBlocks(md: string): string[] {
  * @param logger - Optional logger.
  * @returns The parsed object or null if failed.
  */
-export function parseYamlBlock<T extends Record<string, unknown>>(
+function parseYamlBlock<T extends Record<string, unknown>>(
   block: string,
   logger?: ILogger,
 ): T | null {
@@ -54,7 +54,7 @@ export function parseYamlBlock<T extends Record<string, unknown>>(
  * @param obj - The object to dump.
  * @returns The YAML string representation.
  */
-export function dumpYaml(obj: Record<string, unknown>): string {
+function dumpYaml(obj: Record<string, unknown>): string {
   return dump(obj);
 }
 
@@ -133,7 +133,7 @@ export function parseYamlBlocksFromFile(
 /**
  * Options for updating a YAML block by ID.
  */
-export interface UpdateYamlBlockOptions {
+interface UpdateYamlBlockOptions {
   filePath: string;
   id: string;
   updatedData: Record<string, unknown>;

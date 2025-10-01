@@ -27,7 +27,7 @@ export class PinoLogger implements ILogger {
     const isCli = opts?.isCli ?? false;
     const options = {
       ...opts,
-      level: process.env['LOG_LEVEL'] ?? (isCli ? 'warn' : 'info'),
+      level: process.env['LOG_LEVEL'] ?? (isCli ? 'error' : 'info'),
     };
 
     if (!isCli) {
@@ -35,18 +35,21 @@ export class PinoLogger implements ILogger {
     }
 
     // For CLI usage, use pretty printing and only show warnings/errors by default
-    return pino({
-      ...options,
-      transport: {
-        options: {
-          colorize: true,
-          ignore: 'pid,hostname',
-          messageFormat: '{msg}',
-          translateTime: 'SYS:HH:MM:ss',
+    return pino(
+      {
+        ...options,
+        transport: {
+          options: {
+            colorize: true,
+            ignore: 'pid,hostname',
+            messageFormat: '{msg}',
+            translateTime: 'SYS:HH:MM:ss',
+          },
+          target: 'pino-pretty',
         },
-        target: 'pino-pretty',
       },
-    });
+      pino.destination(process.stderr.fd),
+    );
   }
 
   /**

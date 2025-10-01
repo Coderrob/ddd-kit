@@ -1,6 +1,8 @@
+import { ITask } from '../tasks/ITask';
+
 /**
  * Interface for filtering tasks based on exclusion patterns.
  */
 export interface IExclusionFilter {
-  shouldExclude(task: Record<string, unknown>): boolean;
+  shouldExclude(task: ITask): boolean;
 }

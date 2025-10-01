@@ -4,7 +4,7 @@ import { ContainerBootstrap } from './bootstrap';
 
 let containerInstance: (IServiceRegistry & IServiceResolver) | null = null;
 
-export class Container implements IServiceRegistry, IServiceResolver {
+class Container implements IServiceRegistry, IServiceResolver {
   private readonly services = new Map<string, unknown>();
 
   register<T>(key: string, factory: () => T): void {

@@ -6,7 +6,7 @@ import { parseJsonFile } from '../parsers/json.parser';
 
 import { isString, safeGet } from './type-guards';
 
-export interface IRegistryEntry {
+interface IRegistryEntry {
   path: string;
   status: string;
   sha: string;
@@ -14,7 +14,7 @@ export interface IRegistryEntry {
   requires: string[];
 }
 
-export interface RegistryEntryDetails {
+interface RegistryEntryDetails {
   status: string;
   requires: string[];
 }

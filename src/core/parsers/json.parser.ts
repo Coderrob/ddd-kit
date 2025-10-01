@@ -3,6 +3,16 @@ import { IFileManager } from '../../types/core';
 import { getLogger } from '../system/logger';
 
 /**
+ * Formats an object as a pretty-printed JSON string.
+ * @param obj - The object to format.
+ * @param indent - The number of spaces for indentation (default: 0).
+ * @returns The formatted JSON string.
+ */
+export function formatJson(obj: unknown, indent: number = 0): string {
+  return JSON.stringify(obj, null, indent);
+}
+
+/**
  * Parses a JSON file and returns the parsed object.
  * @param filePath - The path to the JSON file.
  * @param fileManager - The file manager to use for file operations.
@@ -42,7 +52,7 @@ export function writeJsonFile<T = Record<string, unknown>>(
 ): boolean {
   const log = logger ?? getLogger();
   try {
-    const jsonString = JSON.stringify(data, null, 2);
+    const jsonString = formatJson(data);
     fileManager.writeFileSync(filePath, jsonString);
     log.debug('Wrote JSON file', { filePath });
     return true;
@@ -69,14 +79,4 @@ export function safeJsonParse<T = Record<string, unknown>>(
     log.warn('Failed to parse JSON string', { error: String(e) });
     return null;
   }
-}
-
-/**
- * Formats an object as a pretty-printed JSON string.
- * @param obj - The object to format.
- * @param indent - The number of spaces for indentation (default: 2).
- * @returns The formatted JSON string.
- */
-export function formatJson(obj: unknown, indent: number = 2): string {
-  return JSON.stringify(obj, null, indent);
 }

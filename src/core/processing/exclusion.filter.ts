@@ -1,3 +1,4 @@
+import { ITask } from '../../types';
 import { IExclusionFilter } from '../../types/repository';
 import { isNullOrUndefined } from '../helpers/type-guards';
 
@@ -22,11 +23,11 @@ export class ExclusionFilter implements IExclusionFilter {
    * @param task - The task object to check for exclusion.
    * @returns True if the task should be excluded, false otherwise.
    */
-  shouldExclude(task: Record<string, unknown>): boolean {
+  shouldExclude(task: ITask): boolean {
     if (!this.excludeRegex) return false;
 
-    const id = String(task['id'] ?? '');
-    const owner = String(task['owner'] ?? '');
+    const id = task.id;
+    const owner = task.owner ?? '';
     const summary = String(task['summary'] ?? '');
 
     return (

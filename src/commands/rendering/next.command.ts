@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 
-import { TaskProviderType } from '../../types';
+import { CommandName, TaskProviderType } from '../../types';
 import { ILogger, IObservabilityLogger } from '../../types/observability';
 import { NextCommandOptions } from '../../types/rendering';
 import { ITaskRepository } from '../../types/repository';
@@ -24,7 +24,7 @@ import { NextCommandTelemetry, OperationContext } from './next.command.telemetry
  * Enhanced with comprehensive observability and diagnostics.
  */
 export class NextCommand extends BaseCommand {
-  override name = 'next';
+  override name = CommandName.NEXT;
   override description = 'Hydrate the next eligible task';
   private readonly hydrationService: TaskHydrationService;
   private readonly observabilityLogger: IObservabilityLogger;
@@ -132,7 +132,7 @@ export class NextCommand extends BaseCommand {
 
   static configure(program: Command, logger: ILogger): void {
     program
-      .command('next')
+      .command(CommandName.NEXT)
       .description('Hydrate the next eligible task')
       .option('--provider <provider>', 'Task provider: todo, issues, projects', 'todo')
       .option('--filters <filters...>', 'Filters for task selection')

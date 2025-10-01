@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 
 import { ILogger } from '../../types/observability';
-import { TodoManager } from '../../core/storage/todo';
+import { TaskManager } from '../../core/storage/task.manager';
 import { BaseCommand } from '../shared/base.command';
 import { CommandName } from '../../types';
 
@@ -17,7 +17,7 @@ export class ListTasksCommand extends BaseCommand {
    * Retrieves all tasks from TODO.md and displays them in a formatted list.
    */
   execute(): Promise<void> {
-    const todoManager = new TodoManager(this.logger);
+    const todoManager = new TaskManager(this.logger);
     const tasks = todoManager.listTasks();
 
     if (!tasks.length) {

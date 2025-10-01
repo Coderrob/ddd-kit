@@ -6,7 +6,7 @@ import { ILogger } from '../../types/observability';
 import { CommandName, IUIdSupersedeUseCase } from '../../types';
 import { BaseCommand } from '../shared/base.command';
 
-export interface ISupersedeOptions {
+interface ISupersedeOptions {
   oldUid: string;
   newUid: string;
 }

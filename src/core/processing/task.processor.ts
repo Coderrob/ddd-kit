@@ -1,17 +1,9 @@
-import { IExclusionFilter } from '../../types/repository';
-import { ITaskFixer, ITask } from '../../types/tasks';
-import { IValidationResultBuilder } from '../../types/validation';
+import { ITaskFixer, IExclusionFilter, IValidationResultBuilder, ITask } from '../../types';
 import { ValidationContext } from '../../validators/validation.context';
+import { isTask } from '../helpers/type-guards';
 import { TaskPersistenceService } from '../services/task-persistence.service';
 import { TaskValidationService } from '../services/task-validation-processor.service';
 
-/**
- * Processes individual tasks for validation and fixing.
- * Follows Single Responsibility Principle (SRP) and Dependency Inversion Principle (DIP).
- *
- * This class orchestrates the validation and fixing process by delegating
- * specific responsibilities to dedicated service classes.
- */
 export class TaskProcessor {
   /**
    * Creates a new TaskProcessor instance.
@@ -42,8 +34,8 @@ export class TaskProcessor {
    * @param index - The index of this task in the processing batch (for error reporting)
    * @returns Promise that resolves when task processing is complete
    */
-  async processTask(task: unknown, index: number): Promise<void> {
-    if (!this.isITask(task)) {
+  async processTask(task: ITask, index: number): Promise<void> {
+    if (!isTask(task)) {
       this.options.resultBuilder.addError(`Task[${index}] is not a valid ITask shape`);
       return;
     }
@@ -104,12 +96,5 @@ export class TaskProcessor {
 
       this.options.validationService.revalidateAfterFixes(taskObj, index);
     }
-  }
-
-  /** Type guard to ensure a value conforms to ITask minimally by id being a string. */
-  private isITask(value: unknown): value is ITask {
-    if (typeof value !== 'object' || value === null) return false;
-    const obj = value as { id?: unknown };
-    return typeof obj.id === 'string' && obj.id.length > 0;
   }
 }

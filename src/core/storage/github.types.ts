@@ -1,7 +1,9 @@
+import { isObject } from '../helpers/type-guards';
+
 /**
  * GitHub API types for type safety
  */
-export interface GitHubUser {
+interface GitHubUser {
   login: string;
   id: number;
   avatar_url: string;
@@ -14,14 +16,14 @@ export interface GitHubLabel {
   description: string | null;
 }
 
-export interface GitHubMilestone {
+interface GitHubMilestone {
   id: number;
   title: string;
   due_on: string | null;
   state: 'open' | 'closed';
 }
 
-export interface GitHubIssue {
+interface GitHubIssue {
   id: number;
   number: number;
   title: string;
@@ -44,25 +46,11 @@ export interface GitHubIssue {
  */
 export function isGitHubIssue(value: unknown): value is GitHubIssue {
   return (
-    typeof value === 'object' &&
-    value !== null &&
+    isObject(value) &&
     'number' in value &&
     'title' in value &&
     'state' in value &&
     'created_at' in value &&
     'updated_at' in value
-  );
-}
-
-/**
- * Type guard to check if an unknown value is a GitHub label
- */
-export function isGitHubLabel(value: unknown): value is GitHubLabel {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    'id' in value &&
-    'name' in value &&
-    'color' in value
   );
 }

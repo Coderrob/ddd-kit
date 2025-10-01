@@ -1,3 +1,7 @@
+import { IValidationResult } from '../validation';
+
+import { ITask } from './ITask';
+
 /**
  * Interface for validating tasks against business rules and schemas.
  *
@@ -9,7 +13,7 @@
  * const validator = container.resolve<ITaskValidator>('TaskValidator');
  * const result = validator.validate(taskData);
  *
- * if (result.ok) {
+ * if (result.isValid) {
  *   console.log('Task is valid');
  * } else {
  *   console.log('Validation errors:', result.errors);
@@ -33,10 +37,10 @@ export interface ITaskValidator {
    *   status: 'pending'
    * });
    *
-   * if (!result.ok) {
+   * if (!result.isValid) {
    *   result.errors?.forEach(error => logger.error(error));
    * }
    * ```
    */
-  validate(task: unknown): { ok: boolean; errors?: unknown[] };
+  validate(task: ITask): IValidationResult;
 }

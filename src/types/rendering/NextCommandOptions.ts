@@ -1,8 +1,4 @@
 /**
- * Type definitions for Commander.js options and arguments for each command type.
- * These interfaces define the schema for command-line options and arguments.
- */
-/**
  * Options for the 'next' command
  */
 export interface NextCommandOptions {

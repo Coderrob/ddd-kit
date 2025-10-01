@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 
-import { TodoManager } from '../../core/storage/todo';
+import { TaskManager } from '../../core/storage/task.manager';
 import { ILogger } from '../../types/observability';
 import { validateTasks } from '../../validators/validator';
 import { BaseCommand } from '../shared/base.command';
@@ -43,11 +43,11 @@ export class ValidateTasksCommand extends BaseCommand {
    * ```
    */
   execute(): Promise<void> {
-    const todoManager = new TodoManager(this.logger);
+    const todoManager = new TaskManager(this.logger);
     const tasks = todoManager.listTasks();
     const result = validateTasks(tasks);
 
-    if (result.valid) {
+    if (result.isValid) {
       this.logger.info(`All ${tasks.length} tasks validate against schema`);
       return Promise.resolve();
     }

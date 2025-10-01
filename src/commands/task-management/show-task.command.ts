@@ -2,10 +2,11 @@ import chalk from 'chalk';
 import { Command } from 'commander';
 
 import { ILogger } from '../../types/observability';
-import { TodoManager } from '../../core/storage/todo';
+import { TaskManager } from '../../core/storage/task.manager';
 import { EXIT_CODES } from '../../constants/exit-codes';
 import { BaseCommand } from '../shared/base.command';
 import { CommandName } from '../../types';
+import { formatJson } from '../../core/parsers/json.parser';
 
 interface TaskDetails {
   detailed_requirements?: unknown;
@@ -15,7 +16,7 @@ interface TaskDetails {
 /**
  * Arguments for the 'todo show' command
  */
-export interface TodoShowCommandArgs {
+interface TodoShowCommandArgs {
   /** Task ID to show */
   id: string;
 }
@@ -32,7 +33,7 @@ export class ShowTaskCommand extends BaseCommand {
    * Displays detailed information about a task including its status, owner, requirements, and validations.
    */
   execute(args: TodoShowCommandArgs): Promise<void> {
-    const todoManager = new TodoManager(this.logger);
+    const todoManager = new TaskManager(this.logger);
     const task = todoManager.findTaskById(args.id);
 
     if (!task) {
@@ -49,7 +50,7 @@ export class ShowTaskCommand extends BaseCommand {
     console.log('\nDetailed requirements:');
 
     try {
-      console.log(JSON.stringify((task as TaskDetails).detailed_requirements ?? {}, null, 2));
+      console.log(formatJson((task as TaskDetails).detailed_requirements ?? {}));
     } catch {
       console.log('(invalid or missing detailed_requirements)');
       this.logger.warn('Invalid detailed_requirements in task', { id: args.id });
@@ -57,7 +58,7 @@ export class ShowTaskCommand extends BaseCommand {
 
     console.log('\nValidations:');
     try {
-      console.log(JSON.stringify((task as TaskDetails).validations ?? {}, null, 2));
+      console.log(formatJson((task as TaskDetails).validations ?? {}));
     } catch {
       console.log('(invalid or missing validations)');
       this.logger.warn('Invalid validations in task', { id: args.id });

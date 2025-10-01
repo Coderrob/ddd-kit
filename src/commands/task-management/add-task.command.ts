@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import { Command } from 'commander';
 
 import { ILogger } from '../../types/observability';
-import { TodoManager } from '../../core/storage/todo';
+import { TaskManager } from '../../core/storage/task.manager';
 import { AddTaskArgs } from '../../types/tasks';
 import { EXIT_CODES } from '../../constants/exit-codes';
 import { BaseCommand } from '../shared/base.command';
@@ -43,7 +43,7 @@ export class AddTaskCommand extends BaseCommand {
    */
   execute(args: AddTaskArgs): Promise<void> {
     try {
-      const manager = new TodoManager(this.logger);
+      const manager = new TaskManager(this.logger);
       const added = manager.addTaskFromFile(args.file);
       if (added) {
         console.log(chalk.green(`Task added to TODO.md from ${args.file}`));

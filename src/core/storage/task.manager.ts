@@ -23,7 +23,7 @@ const CHANGELOG_PATH = path.join(ROOT, 'CHANGELOG.md');
  * stored in markdown files and changelog entries. It provides a clean
  * interface for CRUD operations on tasks and changelog management.
  */
-export class TodoManager implements ITaskStore, IChangelogStore {
+export class TaskManager implements ITaskStore, IChangelogStore {
   private readonly logger: ILogger;
   private readonly fileManager: FileManager;
 

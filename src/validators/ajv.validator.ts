@@ -1,6 +1,8 @@
 import Ajv, { AnySchema, ValidateFunction } from 'ajv';
 import addFormats from 'ajv-formats';
 
+import { IValidationResult } from '../types';
+
 import { SchemaLoader } from './schema.loader';
 
 /**
@@ -32,14 +34,15 @@ export class AjvValidator {
    * @param obj - The object to validate.
    * @returns An object containing validation result and any errors.
    */
-  validate(obj: unknown): { ok: boolean; errors?: unknown[] } {
+  validate(obj: unknown): IValidationResult {
     if (!this.validateFn) this.compile();
     if (!this.validateFn) throw new Error('Failed to compile validator');
-    const ok = Boolean(this.validateFn(obj));
-    const result: { ok: boolean; errors?: unknown[] } = { ok };
-    if (this.validateFn.errors) {
-      result.errors = [...this.validateFn.errors];
-    }
+    const isValid = Boolean(this.validateFn(obj));
+    const errors = this.validateFn.errors
+      ? this.validateFn.errors.map((e) => e.message ?? String(e))
+      : [];
+    const result: IValidationResult = { isValid, errors };
+
     return result;
   }
 }

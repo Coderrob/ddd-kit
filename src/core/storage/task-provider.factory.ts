@@ -1,7 +1,7 @@
 import { ITaskRepository, TaskProviderType } from '../../types';
 import { ILogger } from '../../types/observability';
 
-import { TodoProvider } from './todo.provider';
+import { TaskProvider } from './task.provider';
 import { IssuesProvider } from './issues.provider';
 import { ProjectsProvider } from './projects.provider';
 
@@ -13,7 +13,7 @@ export class TaskProviderFactory {
   static create(providerType: TaskProviderType, logger: ILogger): ITaskRepository {
     switch (providerType) {
       case TaskProviderType.TODO:
-        return new TodoProvider(logger);
+        return new TaskProvider(logger);
 
       case TaskProviderType.ISSUES:
         return new IssuesProvider(logger);

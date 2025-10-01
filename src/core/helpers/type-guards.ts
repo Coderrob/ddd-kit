@@ -2,6 +2,8 @@
  * Type guards and utility functions for defensive programming
  */
 
+import { ITask } from '../../types';
+
 /**
  * Type guard to check if a value is a string
  */
@@ -19,8 +21,8 @@ export function isObject(value: unknown): value is Record<string, unknown> {
 /**
  * Type guard to check if a value is an empty array
  */
-export function isEmptyArray(value: unknown): value is [] {
-  return Array.isArray(value) && value.length <= 0;
+export function isEmptyArray(value: unknown): boolean {
+  return Array.isArray(value) && value.length === 0;
 }
 
 /**
@@ -34,21 +36,7 @@ export function isEmptyString(value: unknown): value is '' {
  * Type guard to check if a value is a non-empty string
  */
 export function isNonEmptyString(value: unknown): value is string {
-  return isString(value) && value.trim().length > 0;
-}
-
-/**
- * Type guard to check if a value is a non-empty array
- */
-export function isNonEmptyArray<T>(value: unknown): value is T[] {
-  return Array.isArray(value) && value.length > 0;
-}
-
-/**
- * Type guard to check if a value is null
- */
-export function isNull(value: unknown): value is null {
-  return value === null;
+  return isString(value) && !isEmptyString(value.trim());
 }
 
 /**
@@ -56,6 +44,13 @@ export function isNull(value: unknown): value is null {
  */
 export function isNullOrUndefined(value: unknown): value is null | undefined {
   return value === null || typeof value === 'undefined';
+}
+
+/** Type guard to ensure a value conforms to ITask minimally by id being a string. */
+export function isTask(value: unknown): value is ITask {
+  if (isNullOrUndefined(value) || !isObject(value)) return false;
+  const obj = value as { id?: string };
+  return isNonEmptyString(obj.id);
 }
 
 /**

@@ -9,13 +9,13 @@ import { ValidationResultBuilder } from './validation-result.builder';
 export class ValidationResult implements IValidationResult {
   /**
    * Creates a new ValidationResult instance.
-   * @param valid - Whether all tasks passed validation without errors.
+   * @param isValid - Whether all tasks passed validation without errors.
    * @param errors - Optional array of validation error messages.
    * @param fixesApplied - Optional number of fixes that were successfully applied.
    * @param fixes - Optional array of FixRecord objects describing the fixes applied.
    */
   constructor(
-    public readonly valid: boolean,
+    public readonly isValid: boolean,
     public readonly errors?: string[],
     public readonly fixesApplied?: number,
     public readonly fixes?: FixRecord[],

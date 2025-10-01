@@ -1,10 +1,10 @@
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 
-import { ITaskStore, FixRecord, ITask } from '../types/tasks';
+import { ITaskStore, ITask } from '../types/tasks';
 import { ILogger } from '../types/observability';
 import { TaskValidationService } from '../services/task-validation.service';
-import { isNullOrUndefined } from '../core/helpers/type-guards';
+import { IValidationResult } from '../types';
 
 import { SchemaLoader } from './schema.loader';
 import { AjvValidator } from './ajv.validator';
@@ -24,7 +24,7 @@ addFormats(ajv);
  *   - valid: boolean indicating if all tasks passed validation
  *   - errors: array of error messages (only present if valid is false)
  */
-export function validateTasks(tasks: ITask[]): { valid: boolean; errors?: string[] } {
+export function validateTasks(tasks: ITask[]): IValidationResult {
   const loader = new SchemaLoader();
   const validator = new AjvValidator(loader);
   const errors: string[] = [];
@@ -32,7 +32,7 @@ export function validateTasks(tasks: ITask[]): { valid: boolean; errors?: string
     // Array access with controlled index is safe
     // eslint-disable-next-line security/detect-object-injection
     const res = validator.validate(tasks[i]);
-    if (!res.ok) {
+    if (!res.isValid) {
       const msg = (res.errors || [])
         .map((e: unknown) => {
           const error = e as { instancePath?: string; message?: string };
@@ -42,7 +42,7 @@ export function validateTasks(tasks: ITask[]): { valid: boolean; errors?: string
       errors.push(`Task[${i}] validation failed: ${msg}`);
     }
   }
-  return { valid: errors.length === 0, ...(errors.length ? { errors } : {}) };
+  return { isValid: errors.length === 0, ...(errors.length ? { errors } : {}) };
 }
 
 /**
@@ -71,28 +71,23 @@ export function validateTasks(tasks: ITask[]): { valid: boolean; errors?: string
  *   - fixes: array of FixRecord objects describing all fixes that were applied or would be applied
  */
 export async function validateAndFixTasks(
-  tasks: unknown[],
+  tasks: ITask[],
   options: {
     applyFixes: boolean;
     excludePattern?: string;
     store?: ITaskStore;
     logger?: ILogger;
   },
-): Promise<{ valid: boolean; errors?: string[]; fixesApplied?: number; fixes?: FixRecord[] }> {
+): Promise<IValidationResult> {
   const service = new TaskValidationService();
   const result = await service.validateAndFixTasks(tasks, options);
 
-  const returnValue = {
-    valid: result.valid,
-  } as { valid: boolean; errors?: string[]; fixesApplied?: number; fixes?: FixRecord[] };
-  if (!isNullOrUndefined(result.errors)) {
-    returnValue.errors = result.errors;
-  }
-  if (!isNullOrUndefined(result.fixesApplied)) {
-    returnValue.fixesApplied = result.fixesApplied;
-  }
-  if (!isNullOrUndefined(result.fixes)) {
-    returnValue.fixes = result.fixes;
-  }
+  const returnValue: IValidationResult = {
+    isValid: result.isValid,
+    errors: result.errors,
+    fixesApplied: result.fixesApplied,
+    fixes: result.fixes,
+  };
+
   return returnValue;
 }

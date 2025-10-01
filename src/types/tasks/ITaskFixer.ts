@@ -1,4 +1,5 @@
 import type { FixRecord } from './FixRecord';
+import { ITask } from './ITask';
 
 /**
  * Interface for automatically fixing common task validation issues.
@@ -43,5 +44,5 @@ export interface ITaskFixer {
    * // - Set priority to null
    * ```
    */
-  applyBasicFixes(task: Record<string, unknown>): FixRecord[];
+  applyBasicFixes(task: ITask): FixRecord[];
 }

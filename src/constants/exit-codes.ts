@@ -21,5 +21,3 @@ export enum EXIT_CODES {
   /** Fix operation failed */
   FIX_FAILED = 5,
 }
-
-export type ExitCode = (typeof EXIT_CODES)[keyof typeof EXIT_CODES];

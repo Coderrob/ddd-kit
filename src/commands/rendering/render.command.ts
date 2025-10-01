@@ -5,14 +5,14 @@ import { SERVICE_KEYS } from '../../types/core';
 import { RenderCommandOptions } from '../../types/rendering';
 import { ILogger } from '../../types/observability';
 import { IRenderOptions } from '../../types/tasks';
-import { ITaskRenderUseCase } from '../../types';
+import { CommandName, ITaskRenderUseCase } from '../../types';
 import { BaseCommand } from '../shared/base.command';
 
 /**
  * Command for rendering a specific task.
  */
 export class RenderCommand extends BaseCommand {
-  override name = 'render';
+  override name = CommandName.RENDER;
   override description = 'Re-render guidance for a specific task';
 
   /**
@@ -34,7 +34,7 @@ export class RenderCommand extends BaseCommand {
 
   static configure(program: Command, logger: ILogger): void {
     program
-      .command('render')
+      .command(CommandName.RENDER)
       .argument('<task>', 'Task ID to render')
       .description('Re-render guidance for a specific task')
       .option('--pin <sha>', 'Pin to specific ddd-kit commit/tag')

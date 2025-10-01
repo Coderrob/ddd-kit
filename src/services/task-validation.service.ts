@@ -1,5 +1,5 @@
 import { ILogger } from '../types/observability';
-import { ITaskStore } from '../types/tasks';
+import { ITask, ITaskStore } from '../types/tasks';
 import { TaskProcessor } from '../core/processing/task.processor';
 import { ValidationContext } from '../validators/validation.context';
 import { ValidationFactory } from '../validators/validation.factory';
@@ -18,7 +18,7 @@ export class TaskValidationService {
    * @returns A Promise that resolves to a ValidationResult containing the outcome of the operation.
    */
   async validateAndFixTasks(
-    tasks: unknown[],
+    tasks: ITask[],
     options: {
       applyFixes: boolean;
       excludePattern?: string;

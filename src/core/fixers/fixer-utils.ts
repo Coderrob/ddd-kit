@@ -1,4 +1,5 @@
 import { FixRecord, ITask } from '../../types/tasks';
+import { isEmptyString, isNullOrUndefined, isString } from '../helpers/type-guards';
 
 /** Safely set a field if it changed and push a fix record. */
 export function setIfChanged(params: {
@@ -10,20 +11,20 @@ export function setIfChanged(params: {
 }): void {
   const { asObj, field, next, fixes, id } = params;
   // eslint-disable-next-line security/detect-object-injection
-  const current = (asObj as Record<string, unknown>)[field];
+  const current = asObj[field];
   if (current === next) return;
   fixes.push({ field: String(field), id, new: next as string, old: current as string });
   // eslint-disable-next-line security/detect-object-injection
-  (asObj as Record<string, unknown>)[field] = next;
+  asObj[field] = next;
 }
 
-export function isValidDate(value: string | undefined): boolean {
-  if (typeof value === 'undefined' || value === '') return false;
+function isValidDate(value: string | undefined): boolean {
+  if (isNullOrUndefined(value) || isEmptyString(value)) return false;
   const t = Date.parse(value);
   return !Number.isNaN(t);
 }
 
 export function normalizeToIso(nowIso: string, value: string | undefined): string {
-  if (!isValidDate(value)) return nowIso;
-  return new Date(String(value)).toISOString();
+  if (!isString(value) || !isValidDate(value)) return nowIso;
+  return new Date(value).toISOString();
 }

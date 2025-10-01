@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { TodoManager } from '../dist/core/storage/todo.js';
+import { TodoManager } from '../dist/core/storage/task.js';
 import { getLogger } from '../dist/core/system/logger.js';
 import { validateTasks } from '../dist/validators/validator.js';
 

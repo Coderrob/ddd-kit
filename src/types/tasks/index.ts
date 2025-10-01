@@ -19,7 +19,6 @@ export * from './AddTaskArgs';
 export * from './CompleteTaskArgs';
 export * from './CompleteTaskOptions';
 
-export * from './IProvenance';
 export * from './IRenderOptions';
 export * from './IHydrationOptions';
 export * from './IResolvedRef';

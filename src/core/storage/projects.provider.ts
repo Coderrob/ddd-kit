@@ -1,8 +1,9 @@
 import { ITask, TaskState, TaskStatus } from '../../types/tasks';
 import { ITaskRepository } from '../../types/repository';
 import { ILogger } from '../../types/observability';
+import { formatJson } from '../parsers/json.parser';
 
-import { ProjectV2Item, GraphQLResponse, hasContent, GitHubProjectIssue } from './projects.types';
+import { ProjectV2Item, GraphQLResponse, GitHubProjectIssue, hasContent } from './projects.types';
 
 /**
  * GitHub Projects provider for task management.
@@ -88,7 +89,7 @@ export class ProjectsProvider implements ITaskRepository {
     variables: Record<string, string>,
   ): Promise<GraphQLResponse> {
     const response = await fetch(this.graphqlUrl, {
-      body: JSON.stringify({ query, variables }),
+      body: formatJson({ query, variables }),
       headers: {
         Authorization: `Bearer ${this.githubToken}`,
         'Content-Type': 'application/json',

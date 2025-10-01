@@ -1,15 +1,15 @@
 import { ITaskStore, ITask } from '../../types';
 
-import { TodoManager } from './todo';
+import { TaskManager } from './task.manager';
 
 /**
  * Default implementation of ITaskStore that uses the TodoManager class.
  */
 export class DefaultTaskStore implements ITaskStore {
-  private readonly todoManager: TodoManager;
+  private readonly todoManager: TaskManager;
 
   constructor() {
-    this.todoManager = new TodoManager();
+    this.todoManager = new TaskManager();
   }
 
   /**

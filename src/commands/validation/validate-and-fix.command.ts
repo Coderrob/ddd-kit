@@ -1,12 +1,11 @@
 import { Command } from 'commander';
 
-import { ValidateFixCommandOptions } from '../../types/validation';
-import { FixRecord } from '../../types/tasks';
+import { IValidationResult, ValidateFixCommandOptions } from '../../types/validation';
 import { ILogger } from '../../types/observability';
-import { TodoManager } from '../../core/storage/todo';
+import { TaskManager } from '../../core/storage/task.manager';
 import { validateAndFixTasks } from '../../validators/validator';
 import { ValidationResultRenderer } from '../../core/rendering/validation-result.renderer';
-import { isNonEmptyString } from '../../core/helpers/type-guards';
+import { isEmptyArray, isNonEmptyString } from '../../core/helpers/type-guards';
 import { EXIT_CODES } from '../../constants/exit-codes';
 import { BaseCommand } from '../shared/base.command';
 
@@ -57,7 +56,7 @@ export class ValidateAndFixCommand extends BaseCommand {
    * Performs the validation and fixing operation.
    */
   private performValidation(options: ValidateFixCommandOptions) {
-    const todoManager = new TodoManager(this.logger);
+    const todoManager = new TaskManager(this.logger);
     const validationOptions: Parameters<typeof validateAndFixTasks>[1] = {
       applyFixes: Boolean(options.fix) && options.dryRun !== true,
     };
@@ -72,22 +71,17 @@ export class ValidateAndFixCommand extends BaseCommand {
    */
   private handleValidationResult(
     options: ValidateFixCommandOptions,
-    res: {
-      valid: boolean;
-      errors?: string[];
-      fixesApplied?: number;
-      fixes?: FixRecord[];
-    },
+    result: IValidationResult,
   ): void {
     // Handle validation errors first
-    if (res.errors && res.errors.length > 0) {
-      this.handleValidationErrors(res.errors);
+    if (result.errors && !isEmptyArray(result.errors)) {
+      this.handleValidationErrors(result.errors);
       return;
     }
 
     // Use renderer for all output
-    const todoManager = new TodoManager(this.logger);
-    this.renderer.render(options, res, todoManager.listTasks().length);
+    const todoManager = new TaskManager(this.logger);
+    this.renderer.render(options, result, todoManager.listTasks().length);
   }
 
   /**

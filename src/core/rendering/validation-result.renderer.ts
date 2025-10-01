@@ -1,6 +1,14 @@
 import chalk from 'chalk';
 
-import { ILogger, ValidateFixCommandOptions, FixRecord, OutputFormat } from '../../types';
+import {
+  ILogger,
+  ValidateFixCommandOptions,
+  FixRecord,
+  OutputFormat,
+  IValidationResult,
+} from '../../types';
+import { formatJson } from '../parsers/json.parser';
+import { isEmptyArray } from '../helpers/type-guards';
 
 /**
  * Handles rendering of validation results in different output formats.
@@ -12,18 +20,9 @@ export class ValidationResultRenderer {
   /**
    * Renders validation results based on the specified format.
    */
-  render(
-    options: ValidateFixCommandOptions,
-    result: {
-      valid: boolean;
-      errors?: string[];
-      fixesApplied?: number;
-      fixes?: FixRecord[];
-    },
-    taskCount?: number,
-  ): void {
+  render(options: ValidateFixCommandOptions, result: IValidationResult, taskCount?: number): void {
     // Early return for successful validation with no fixes
-    if (result.valid && (result.fixesApplied ?? 0) === 0) {
+    if (result.isValid && (result.fixesApplied ?? 0) === 0) {
       const count = taskCount ?? this.getTaskCount();
       console.log(chalk.green(`All ${count} tasks validate against schema`));
       this.logger.info('All tasks validated successfully', { taskCount: count });
@@ -31,12 +30,12 @@ export class ValidationResultRenderer {
     }
 
     // Output fixes if any exist
-    if (result.fixes && result.fixes.length > 0) {
+    if (result.fixes && !isEmptyArray(result.fixes)) {
       this.renderFixes(options, result.fixes, result.fixesApplied, options.dryRun);
     }
 
     // Output completion message for successful fixes
-    if (!result.errors || result.errors.length === 0) {
+    if (!result.errors || isEmptyArray(result.errors)) {
       this.renderCompletionMessage(result.fixes, result.fixesApplied, options.dryRun);
     }
   }
@@ -69,7 +68,7 @@ export class ValidationResultRenderer {
    */
   private renderJsonSummary(fixes: FixRecord[], errors: string[]): void {
     const summary = { errors, fixes };
-    console.log(JSON.stringify(summary, null, 2));
+    console.log(formatJson(summary));
     this.logger.info('JSON summary generated', {
       errorCount: errors.length,
       fixCount: fixes.length,
