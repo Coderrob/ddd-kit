@@ -137,3 +137,8 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Integration test files
+integration-test-metrics.json
+integration-test-report.md
+integration-test.log
