@@ -50,7 +50,7 @@ export class NextCommand extends BaseCommand {
     const op: OperationContext = this.telemetry.recordStart(this.observabilityLogger, options);
 
     try {
-      const provider = this.createProvider(options.provider ?? 'todo');
+      const provider = this.createProvider(options.provider ?? TaskProviderType.TASK);
       const task = await this.findNextTask(provider, options);
 
       if (!task) {
@@ -81,7 +81,7 @@ export class NextCommand extends BaseCommand {
         taskProviderType = providerType;
         break;
       default:
-        taskProviderType = TaskProviderType.TODO;
+        taskProviderType = TaskProviderType.TASK;
     }
     return TaskProviderFactory.create(taskProviderType, this.logger);
   }
@@ -134,7 +134,11 @@ export class NextCommand extends BaseCommand {
     program
       .command(CommandName.NEXT)
       .description('Hydrate the next eligible task')
-      .option('--provider <provider>', 'Task provider: todo, issues, projects', 'todo')
+      .option(
+        '--provider <provider>',
+        'Task provider: task, issues, projects',
+        TaskProviderType.TASK,
+      )
       .option('--filters <filters...>', 'Filters for task selection')
       .option('--branch-prefix <prefix>', 'Branch prefix', 'feature/')
       .option('--pin <sha>', 'Pin to specific ddd-kit commit/tag')

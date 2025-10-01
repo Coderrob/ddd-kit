@@ -16,7 +16,7 @@ export class TaskRenderService implements ITaskRenderUseCase {
   }
 
   async execute(taskId: string, options: IRenderOptions): Promise<void> {
-    const provider = TaskProviderFactory.create(TaskProviderType.TODO, this.logger);
+    const provider = TaskProviderFactory.create(TaskProviderType.TASK, this.logger);
     const task = await provider.findById(taskId);
     if (!task) throw new Error(`Task ${taskId} not found`);
 

@@ -1,5 +1,6 @@
+import { CommandName } from '../../types';
 import { IObservabilityLogger } from '../../types/observability';
-import { IHydrationOptions } from '../../types/tasks';
+import { IHydrationOptions, TaskProviderType } from '../../types/tasks';
 
 export interface OperationContext {
   operationLogger: IObservabilityLogger;
@@ -24,10 +25,10 @@ export class NextCommandTelemetry {
       operationId: 'next_command_execution',
     });
 
-    operationLogger.counter('commands.next.executions', { provider: options.provider ?? 'todo' });
+    operationLogger.counter('commands.next.executions', { provider: options.provider ?? 'task' });
     operationLogger.event('command_execution_started', {
-      command: 'next',
-      provider: options.provider ?? 'todo',
+      command: CommandName.NEXT,
+      provider: options.provider ?? TaskProviderType.TASK,
       hasFilters: Boolean(options.filters?.length),
       filterCount: options.filters?.length ?? 0,
     });
@@ -37,14 +38,14 @@ export class NextCommandTelemetry {
 
   noTaskFound(op: OperationContext, options: IHydrationOptions): void {
     op.operationLogger.warn('No eligible tasks found for next command', {
-      provider: options.provider ?? 'todo',
+      provider: options.provider ?? TaskProviderType.TASK,
       filters: options.filters,
     });
     op.operationLogger.counter('commands.next.no_tasks_found', {
-      provider: options.provider ?? 'todo',
+      provider: options.provider ?? TaskProviderType.TASK,
     });
     op.operationLogger.event('command_execution_completed', {
-      command: 'next',
+      command: CommandName.NEXT,
       success: false,
       reason: 'no_eligible_tasks',
     });
@@ -57,7 +58,7 @@ export class NextCommandTelemetry {
 
     op.operationLogger.span('next_command_execution', op.startTime, endTime, {
       taskId,
-      provider: provider ?? 'todo',
+      provider: provider ?? TaskProviderType.TASK,
       success: true,
     });
 
@@ -66,9 +67,11 @@ export class NextCommandTelemetry {
       duration,
     });
 
-    op.operationLogger.counter('commands.next.success', { provider: provider ?? 'todo' });
+    op.operationLogger.counter('commands.next.success', {
+      provider: provider ?? TaskProviderType.TASK,
+    });
     op.operationLogger.event('command_execution_completed', {
-      command: 'next',
+      command: CommandName.NEXT,
       success: true,
       taskId,
       duration,
@@ -91,18 +94,18 @@ export class NextCommandTelemetry {
     });
 
     op.operationLogger.counter('commands.next.errors', {
-      provider: provider ?? 'todo',
+      provider: provider ?? TaskProviderType.TASK,
       error_type: errorType,
     });
 
     op.operationLogger.span('next_command_execution', op.startTime, endTime, {
-      provider: provider ?? 'todo',
+      provider: provider ?? TaskProviderType.TASK,
       success: false,
       error: message,
     });
 
     op.operationLogger.event('command_execution_completed', {
-      command: 'next',
+      command: CommandName.NEXT,
       success: false,
       error: message,
       duration,

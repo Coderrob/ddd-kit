@@ -1,9 +1,8 @@
-import { ITaskRepository, TaskProviderType } from '../../types';
-import { ILogger } from '../../types/observability';
+import { TaskProviderType, ILogger, ITaskRepository } from '../../types';
 
-import { TaskProvider } from './task.provider';
 import { IssuesProvider } from './issues.provider';
 import { ProjectsProvider } from './projects.provider';
+import { TaskProvider } from './task.provider';
 
 /**
  * Factory for creating task providers following Factory pattern and OCP.
@@ -12,7 +11,7 @@ import { ProjectsProvider } from './projects.provider';
 export class TaskProviderFactory {
   static create(providerType: TaskProviderType, logger: ILogger): ITaskRepository {
     switch (providerType) {
-      case TaskProviderType.TODO:
+      case TaskProviderType.TASK:
         return new TaskProvider(logger);
 
       case TaskProviderType.ISSUES:
@@ -27,6 +26,6 @@ export class TaskProviderFactory {
   }
 
   static getAvailableProviders(): TaskProviderType[] {
-    return [TaskProviderType.TODO, TaskProviderType.ISSUES, TaskProviderType.PROJECTS];
+    return [TaskProviderType.TASK, TaskProviderType.ISSUES, TaskProviderType.PROJECTS];
   }
 }

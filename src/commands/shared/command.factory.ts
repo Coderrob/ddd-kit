@@ -31,12 +31,12 @@ export class CommandFactory {
     const ref = program.command('ref').description('Reference management');
     RefAuditCommand.configure(ref, logger);
 
-    // Todo commands
-    const todo = program.command('todo').description('Task management commands');
-    AddTaskCommand.configure(todo, logger);
-    CompleteTaskCommand.configure(todo, logger);
-    ListTasksCommand.configure(todo, logger);
-    ShowTaskCommand.configure(todo, logger);
+    // Task commands
+    const task = program.command('task').description('Task management commands');
+    AddTaskCommand.configure(task, logger);
+    CompleteTaskCommand.configure(task, logger);
+    ListTasksCommand.configure(task, logger);
+    ShowTaskCommand.configure(task, logger);
 
     // Validate commands
     const validate = program.command('validate').description('Validation commands');

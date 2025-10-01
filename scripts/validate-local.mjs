@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { TodoManager } from '../dist/core/storage/task.js';
+import { TaskManager } from '../dist/core/storage/task.manager.js';
 import { getLogger } from '../dist/core/system/logger.js';
 import { validateTasks } from '../dist/validators/validator.js';
 
@@ -20,11 +20,11 @@ import { validateTasks } from '../dist/validators/validator.js';
  */
 async function main() {
   try {
-    const todoManager = new TodoManager(getLogger());
-    const tasks = todoManager.listTasks();
+    const taskManager = new TaskManager(getLogger());
+    const tasks = taskManager.listTasks();
     const res = validateTasks(tasks);
 
-    if (res.valid) {
+    if (res.isValid) {
       console.log(`✅ All ${tasks.length} tasks validate successfully.`);
       process.exitCode = 0;
     } else {

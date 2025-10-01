@@ -41,5 +41,5 @@ jobs:
       - name: Run validator unit tests
         run: npm test
 
-      - name: List TODO (smoke)
-        run: node dist/cli.js todo list || true
+      - name: List Tasks (smoke)
+        run: node dist/cli.js task list || true

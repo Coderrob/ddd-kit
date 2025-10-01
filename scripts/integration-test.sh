@@ -629,9 +629,9 @@ test_cli_help() {
         return 1
     fi
 
-    info "Testing todo help"
-    if ! run_cli_with_output "todo --help"; then
-        error "Todo help command failed"
+    info "Testing task help"
+    if ! run_cli_with_output "task --help"; then
+        error "Task help command failed"
         return 1
     fi
 
@@ -657,17 +657,17 @@ test_task_management() {
 
     # Add tasks
     info "Adding test tasks..."
-    if ! run_cli_command "todo add $TEST_DIR/task1-auth.md"; then
+    if ! run_cli_command "task add $TEST_DIR/task1-auth.md"; then
         error "Failed to add task1-auth.md"
         return 1
     fi
 
-    if ! run_cli_command "todo add $TEST_DIR/task2-migration.md"; then
+    if ! run_cli_command "task add $TEST_DIR/task2-migration.md"; then
         error "Failed to add task2-migration.md"
         return 1
     fi
 
-    if ! run_cli_command "todo add $TEST_DIR/task3-docs.md"; then
+    if ! run_cli_command "task add $TEST_DIR/task3-docs.md"; then
         error "Failed to add task3-docs.md"
         return 1
     fi
@@ -676,13 +676,13 @@ test_task_management() {
 
     # List tasks
     info "Listing all tasks..."
-    if ! run_cli_with_output "todo list"; then
+    if ! run_cli_with_output "task list"; then
         warning "Task listing had issues (may be due to existing TODO.md format)"
     fi
 
     # Show task details
     info "Showing task details..."
-    if ! run_cli_with_output "todo show integration.test.task.001"; then
+    if ! run_cli_with_output "task show integration.test.task.001"; then
         warning "Task show command had issues (may be due to existing TODO.md format)"
     fi
 
@@ -759,7 +759,7 @@ test_supersede() {
     fi
 
     info "Checking task list after supersede..."
-    if ! run_cli_with_output "todo list"; then
+    if ! run_cli_with_output "task list"; then
         warning "Task list after supersede had issues"
     fi
 
@@ -772,17 +772,17 @@ test_task_completion() {
     step "Testing task completion..."
 
     info "Completing task 002..."
-    if ! run_cli_command "todo complete integration.test.task.002 --message 'Integration test completion'" false; then
+    if ! run_cli_command "task complete integration.test.task.002 --message 'Integration test completion'" false; then
         warning "Task completion had issues (may be due to existing TODO.md format)"
     fi
 
     info "Completing remaining tasks..."
-    if ! run_cli_command "todo complete integration.test.task.003 --message 'Test cleanup'" false; then
+    if ! run_cli_command "task complete integration.test.task.003 --message 'Test cleanup'" false; then
         warning "Task completion had issues (may be due to existing TODO.md format)"
     fi
 
     info "Checking final task list..."
-    if ! run_cli_with_output "todo list"; then
+    if ! run_cli_with_output "task list"; then
         warning "Final task list had issues"
     fi
 
@@ -832,13 +832,13 @@ This integration test comprehensively validated the DDD-Kit CLI functionality wi
 
 1. **CLI Help System**
    - Main help command (\`--help\`)
-   - Subcommand help (\`todo --help\`, \`validate --help\`, \`ref --help\`)
+   - Subcommand help (\`task --help\`, \`validate --help\`, \`ref --help\`)
 
 2. **Task Management**
-   - Adding tasks from files (\`todo add <file>\`)
-   - Listing all tasks (\`todo list\`)
-   - Showing task details (\`todo show <id>\`)
-   - Task completion with messages (\`todo complete <id> --message "..."\`)
+   - Adding tasks from files (\`task add <file>\`)
+   - Listing all tasks (\`task list\`)
+   - Showing task details (\`task show <id>\`)
+   - Task completion with messages (\`task complete <id> --message "..."\`)
 
 3. **Validation System**
    - Task schema validation (\`validate tasks\`)

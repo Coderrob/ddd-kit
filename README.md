@@ -123,44 +123,44 @@ dddctl <command> [options]
 
 The Document Driven Development Kit CLI provides the following commands and sub-commands:
 
-#### `todo list`
+#### `task list`
 
 List all tasks in the TODO.md file.
 
 Example:
 
 ```bash
-npm run cli -- todo list
+npm run cli -- task list
 ```
 
-#### `todo show`
+#### `task show`
 
 Show details of a specific task by ID.
 
 Example:
 
 ```bash
-npm run cli -- todo show <task-id>
+npm run cli -- task show <task-id>
 ```
 
-#### `todo complete`
+#### `task complete`
 
 Mark a task as complete.
 
 Example:
 
 ```bash
-npm run cli -- todo complete <task-id>
+npm run cli -- task complete <task-id>
 ```
 
-#### `todo add`
+#### `task add`
 
 Add a new task from a file.
 
 Example:
 
 ```bash
-npm run cli -- todo add <file-path>
+npm run cli -- task add <file-path>
 ```
 
 #### `validate tasks`
@@ -208,7 +208,7 @@ npm run cli -- ref audit
   Example:
 
   ```bash
-  npm run cli -- todo --help
+  npm run cli -- task --help
   ```
 
 For a full list of commands and options, run:

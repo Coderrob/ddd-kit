@@ -3,7 +3,7 @@
  * Defines the supported sources for task data.
  */
 export enum TaskProviderType {
-  TODO = 'todo',
+  TASK = 'task',
   ISSUES = 'issues',
   PROJECTS = 'projects',
 }

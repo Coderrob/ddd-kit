@@ -91,7 +91,7 @@ export class TaskHydrationService implements ITaskHydrationUseCase {
 
   /**
    * Creates a task provider based on the specified type.
-   * @param providerType - optional provider type to create, defaults to TODO
+   * @param providerType - optional provider type to create, defaults to TASK
    * @returns the created provider instance
    */
   private createProvider(providerType?: string) {
@@ -101,7 +101,7 @@ export class TaskHydrationService implements ITaskHydrationUseCase {
         return TaskProviderFactory.create(providerType, this.logger);
 
       default:
-        return TaskProviderFactory.create(TaskProviderType.TODO, this.logger);
+        return TaskProviderFactory.create(TaskProviderType.TASK, this.logger);
     }
   }
 
