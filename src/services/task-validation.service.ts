@@ -1,9 +1,11 @@
-import { ILogger } from '../types/ILogger';
-import { ITaskStore } from '../types/ITaskStore';
+import { ILogger } from '../types/observability';
+import { ITaskStore } from '../types/tasks';
 import { TaskProcessor } from '../core/processing/task.processor';
 import { ValidationContext } from '../validators/validation.context';
 import { ValidationFactory } from '../validators/validation.factory';
 import { ValidationResult } from '../validators/validation.result';
+import { TaskValidationService as TaskValidationProcessorService } from '../core/services/task-validation-processor.service';
+import { TaskPersistenceService } from '../core/services/task-persistence.service';
 
 /**
  * Main service for orchestrating task validation and fixing operations.
@@ -31,12 +33,20 @@ export class TaskValidationService {
     const exclusionFilter = ValidationFactory.createExclusionFilter(options.excludePattern);
     const resultBuilder = ValidationFactory.createResultBuilder();
 
+    // Create service dependencies for TaskProcessor
+    const validationService = new TaskValidationProcessorService(validator, resultBuilder);
+    const persistenceService = new TaskPersistenceService(
+      context.getTaskStore(),
+      context.getLogger(),
+    );
+
     const processor = new TaskProcessor({
       context,
       exclusionFilter,
       fixer,
+      persistenceService,
       resultBuilder,
-      validator,
+      validationService,
     });
 
     // Process all tasks

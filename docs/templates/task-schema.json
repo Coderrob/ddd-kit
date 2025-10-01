@@ -15,11 +15,11 @@
     },
     "created": {
       "type": "string",
-      "format": "date"
+      "format": "date-time"
     },
     "updated": {
       "type": "string",
-      "format": "date"
+      "format": "date-time"
     },
     "state": {
       "enum": ["pending", "in-progress", "completed", "cancelled"]

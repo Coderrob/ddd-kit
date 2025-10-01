@@ -1,10 +1,12 @@
 import chalk from 'chalk';
 import { Command } from 'commander';
 
-import { ILogger } from '../../types/ILogger';
-import { addTaskFromFile } from '../../core/storage/todo';
-import { TodoAddCommandArgs } from '../../types/command-options';
+import { ILogger } from '../../types/observability';
+import { TodoManager } from '../../core/storage/todo';
+import { AddTaskArgs } from '../../types/tasks';
 import { EXIT_CODES } from '../../constants/exit-codes';
+import { BaseCommand } from '../shared/base.command';
+import { CommandName } from '../../types';
 
 /**
  * Command for adding a new task from a file to the TODO.md.
@@ -20,13 +22,9 @@ import { EXIT_CODES } from '../../constants/exit-codes';
  * await command.execute({ file: 'tasks/new-feature.md' });
  * ```
  */
-export class AddTaskCommand {
-  /**
-   * Creates a new AddTaskCommand instance.
-   *
-   * @param logger - Logger instance for command execution logging
-   */
-  constructor(private readonly logger: ILogger) {}
+export class AddTaskCommand extends BaseCommand {
+  readonly name = CommandName.ADD;
+  readonly description = 'Add a new task from a file';
 
   /**
    * Executes the add task command.
@@ -43,9 +41,10 @@ export class AddTaskCommand {
    * await command.execute({ file: 'tasks/implement-feature.md' });
    * ```
    */
-  execute(args: TodoAddCommandArgs): Promise<void> {
+  execute(args: AddTaskArgs): Promise<void> {
     try {
-      const added = addTaskFromFile(args.file, this.logger);
+      const manager = new TodoManager(this.logger);
+      const added = manager.addTaskFromFile(args.file);
       if (added) {
         console.log(chalk.green(`Task added to TODO.md from ${args.file}`));
         this.logger.info('Task added successfully', { file: args.file });
@@ -78,7 +77,7 @@ export class AddTaskCommand {
    */
   static configure(parent: Command, logger: ILogger): void {
     parent
-      .command('add')
+      .command(CommandName.ADD)
       .argument('<file>', 'File containing the task to add')
       .description('Add a new task from a file')
       .action(async (file: string) => {

@@ -1,4 +1,4 @@
-import { IExclusionFilter } from '../../types/IExclusionFilter';
+import { IExclusionFilter } from '../../types/repository';
 import { isNullOrUndefined } from '../helpers/type-guards';
 
 /**

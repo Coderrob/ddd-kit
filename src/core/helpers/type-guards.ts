@@ -20,7 +20,7 @@ export function isObject(value: unknown): value is Record<string, unknown> {
  * Type guard to check if a value is an empty array
  */
 export function isEmptyArray(value: unknown): value is [] {
-  return Array.isArray(value) && value.length === 0;
+  return Array.isArray(value) && value.length <= 0;
 }
 
 /**
@@ -34,7 +34,7 @@ export function isEmptyString(value: unknown): value is '' {
  * Type guard to check if a value is a non-empty string
  */
 export function isNonEmptyString(value: unknown): value is string {
-  return isString(value) && value.length > 0;
+  return isString(value) && value.trim().length > 0;
 }
 
 /**

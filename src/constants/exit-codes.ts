@@ -1,4 +1,3 @@
-/* eslint-disable sort-keys */
 /**
  * Shared exit codes for CLI commands
  * Following standard Unix exit code conventions

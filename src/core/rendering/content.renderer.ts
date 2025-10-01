@@ -1,7 +1,7 @@
-import path from 'path';
+import * as path from 'path';
 
-import type { IResolvedRef } from '../../types/ITask';
-import type { IRenderer } from '../../types/IRenderer';
+import type { IResolvedRef } from '../../types/tasks';
+import type { IRenderer } from '../../types/rendering';
 import { FileManager } from '../storage/file-manager';
 import { isNonEmptyString, isNullOrUndefined } from '../helpers/type-guards';
 

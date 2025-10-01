@@ -1,11 +1,9 @@
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 
-import { ITaskStore } from '../types/ITaskStore';
-import { ILogger } from '../types/ILogger';
-import { FixRecord } from '../types/FixRecord';
+import { ITaskStore, FixRecord, ITask } from '../types/tasks';
+import { ILogger } from '../types/observability';
 import { TaskValidationService } from '../services/task-validation.service';
-import { ITask } from '../types/ITask';
 import { isNullOrUndefined } from '../core/helpers/type-guards';
 
 import { SchemaLoader } from './schema.loader';

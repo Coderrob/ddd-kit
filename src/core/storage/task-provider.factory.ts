@@ -1,24 +1,25 @@
 import { ITaskRepository, TaskProviderType } from '../../types';
+import { ILogger } from '../../types/observability';
 
 import { TodoProvider } from './todo.provider';
+import { IssuesProvider } from './issues.provider';
+import { ProjectsProvider } from './projects.provider';
 
 /**
  * Factory for creating task providers following Factory pattern and OCP.
  * Allows extension for new provider types without modifying existing code.
  */
 export class TaskProviderFactory {
-  static create(providerType: TaskProviderType): ITaskRepository {
+  static create(providerType: TaskProviderType, logger: ILogger): ITaskRepository {
     switch (providerType) {
       case TaskProviderType.TODO:
-        return new TodoProvider();
+        return new TodoProvider(logger);
 
       case TaskProviderType.ISSUES:
-        // TODO: Implement GitHub Issues provider
-        throw new Error('GitHub Issues provider not yet implemented');
+        return new IssuesProvider(logger);
 
       case TaskProviderType.PROJECTS:
-        // TODO: Implement GitHub Projects provider
-        throw new Error('GitHub Projects provider not yet implemented');
+        return new ProjectsProvider(logger);
 
       default:
         throw new Error(`Unknown provider type: ${providerType}`);

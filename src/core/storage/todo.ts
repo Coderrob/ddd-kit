@@ -1,17 +1,14 @@
-import fs from 'fs';
-import path from 'path';
+import * as path from 'path';
 
-import { ILogger } from '../../types/ILogger';
-import { ITask } from '../../types/ITask';
-import { getLogger } from '../system/logger';
-import { isNullOrUndefined } from '../helpers/type-guards';
+import { ITaskStore, IChangelogStore, ILogger, ITask } from '../../types';
 import {
-  addYamlBlockFromFile,
   parseYamlBlocksFromFile,
+  addYamlBlockFromFile,
   updateYamlBlockById,
   removeYamlBlockById,
-  UpdateYamlBlockOptions,
 } from '../parsers/yaml.parser';
+import { getLogger } from '../system/logger';
+import { isNullOrUndefined } from '../helpers/type-guards';
 
 import { FileManager } from './file-manager';
 
@@ -20,125 +17,107 @@ const TODO_PATH = path.join(ROOT, 'TODO.md');
 const CHANGELOG_PATH = path.join(ROOT, 'CHANGELOG.md');
 
 /**
- * Appends an entry to the CHANGELOG.md file under the "Unreleased" section.
- * @param entry - The changelog entry to append.
- * @param logger - Optional logger instance for debugging.
+ * Manages TODO tasks and changelog operations.
+ *
+ * This class encapsulates all operations related to managing TODO tasks
+ * stored in markdown files and changelog entries. It provides a clean
+ * interface for CRUD operations on tasks and changelog management.
  */
-export function appendToChangelog(entry: string, logger?: ILogger): void {
-  const log = logger ?? getLogger();
-  if (!fs.existsSync(CHANGELOG_PATH)) {
-    fs.writeFileSync(CHANGELOG_PATH, '# Changelog\n\nUnreleased\n\n' + entry + '\n', 'utf8');
-    log.info('Created CHANGELOG.md and appended entry', { entry });
-    return;
+export class TodoManager implements ITaskStore, IChangelogStore {
+  private readonly logger: ILogger;
+  private readonly fileManager: FileManager;
+
+  constructor(logger?: ILogger) {
+    this.logger = logger ?? getLogger();
+    this.fileManager = new FileManager();
   }
-  const content = FileManager.readFileSync(CHANGELOG_PATH);
-  const idx = content.indexOf('Unreleased');
-  if (idx === -1) {
-    // append at top
-    const newContent = '# Changelog\n\nUnreleased\n\n' + entry + '\n\n' + content;
-    fs.writeFileSync(CHANGELOG_PATH, newContent, 'utf8');
-    return;
+
+  /**
+   * Lists all tasks from the TODO.md file.
+   */
+  listTasks(): ITask[] {
+    const tasks = parseYamlBlocksFromFile(TODO_PATH, this.fileManager, this.logger) as ITask[];
+    this.logger.debug('listTasks extracted', { count: tasks.length });
+    return tasks;
   }
-  // find end of line after Unreleased heading
-  const after = content.indexOf('\n', idx);
-  const insertPos = after + 1;
-  const newContent = content.slice(0, insertPos) + '- ' + entry + '\n' + content.slice(insertPos);
-  fs.writeFileSync(CHANGELOG_PATH, newContent, 'utf8');
-  log.info('Appended entry to CHANGELOG.md', { entry });
-}
 
-/**
- * Adds a task from a file to the TODO.md file by extracting the first YAML block.
- * @param filePath - The path to the file containing the task YAML block.
- * @param logger - Optional logger instance for debugging.
- * @returns True if the task was successfully added, false otherwise.
- */
-export function addTaskFromFile(filePath: string, logger?: ILogger): boolean {
-  const fileManager = new FileManager();
-  return addYamlBlockFromFile(filePath, TODO_PATH, fileManager, logger);
-}
-
-/**
- * Lists all tasks from the TODO.md file by parsing YAML blocks.
- *
- * This function reads the TODO.md file, extracts all YAML frontmatter blocks,
- * and parses them into Task objects. It handles malformed YAML gracefully by
- * logging warnings and skipping invalid blocks.
- *
- * @param logger - Optional logger instance for debugging and error reporting
- * @returns An array of Task objects parsed from the TODO.md file
- * @throws Will not throw but logs warnings for malformed YAML blocks
- */
-export function listTasks(logger?: ILogger): ITask[] {
-  const log = logger ?? getLogger();
-  const fileManager = new FileManager();
-  const tasks = parseYamlBlocksFromFile(TODO_PATH, fileManager, log) as ITask[];
-  log.debug('listTasks extracted', { count: tasks.length });
-  return tasks;
-}
-
-/**
- * Finds a task by its ID from the TODO.md file.
- *
- * Searches through all YAML blocks in the TODO.md file to find a task
- * with the specified ID. Returns the first matching task or null if not found.
- *
- * @param id - The unique task ID to search for (e.g., "T-001")
- * @param logger - Optional logger instance for debugging
- * @returns The Task object if found, null if no task with the given ID exists
- */
-export function findTaskById(id: string, logger?: ILogger): ITask | null {
-  const log = logger ?? getLogger();
-  const tasks = listTasks(log);
-  const found = tasks.find((t) => String((t as Record<string, unknown>)['id'] ?? '') === id);
-  log.debug('findTaskById', { found: Boolean(found), id });
-  return found ?? null;
-}
-
-/**
- * Previews the completion of a task without actually performing the action.
- * @param id - The task ID to preview completion for.
- * @param logger - Optional logger instance for debugging.
- * @returns A string describing what would happen when completing the task.
- */
-export function previewComplete(id: string, logger?: ILogger): string {
-  const log = logger ?? getLogger();
-  const task = findTaskById(id, log);
-  if (isNullOrUndefined(task)) return `Task ${id} not found`;
-  const lines = [] as string[];
-  lines.push(`Will remove task ${id} from TODO.md`);
-  lines.push(`Will append to CHANGELOG.md Unreleased: ${task['id']} — ${task['summary']}`);
-  return lines.join('\n');
-}
-
-/**
- * Updates a task by ID in the TODO.md file.
- * @param id - The task ID to update.
- * @param updatedTask - The updated task object.
- * @param logger - Optional logger instance for debugging.
- * @returns True if the task was updated successfully, false otherwise.
- */
-export function updateTaskById(id: string, updatedTask: ITask, logger?: ILogger): boolean {
-  const fileManager = new FileManager();
-  const options: UpdateYamlBlockOptions = {
-    filePath: TODO_PATH,
-    fileSystem: fileManager,
-    id,
-    updatedData: updatedTask,
-  };
-  if (logger) {
-    options.logger = logger;
+  /**
+   * Finds a task by its ID from the TODO.md file.
+   */
+  findTaskById(id: string): ITask | null {
+    const tasks = this.listTasks();
+    const found = tasks.find((task) => task.id === id);
+    this.logger.debug('findTaskById', { found: !isNullOrUndefined(found), id });
+    return found ?? null;
   }
-  return updateYamlBlockById(options);
-}
 
-/**
- * Removes a task by ID from the TODO.md file.
- * @param id - The task ID to remove.
- * @param logger - Optional logger instance for debugging.
- * @returns True if the task was removed successfully, false otherwise.
- */
-export function removeTaskById(id: string, logger?: ILogger): boolean {
-  const fileManager = new FileManager();
-  return removeYamlBlockById(TODO_PATH, id, fileManager, logger);
+  /**
+   * Adds a task from a file to the TODO.md file.
+   */
+  addTaskFromFile(filePath: string): boolean {
+    return addYamlBlockFromFile(filePath, TODO_PATH, this.fileManager, this.logger);
+  }
+
+  /**
+   * Updates a task by ID in the TODO.md file.
+   */
+  updateTaskById(id: string, updatedTask: ITask): boolean {
+    return updateYamlBlockById({
+      filePath: TODO_PATH,
+      fileSystem: this.fileManager,
+      id,
+      logger: this.logger,
+      updatedData: updatedTask,
+    });
+  }
+
+  /**
+   * Removes a task by ID from the TODO.md file.
+   */
+  removeTaskById(id: string): boolean {
+    return removeYamlBlockById(TODO_PATH, this.fileManager, id, this.logger);
+  }
+
+  /**
+   * Appends an entry to the CHANGELOG.md file under the "Unreleased" section.
+   */
+  appendToChangelog(entry: string): void {
+    if (!this.fileManager.existsSync(CHANGELOG_PATH)) {
+      this.fileManager.writeFileSync(CHANGELOG_PATH, `# Changelog\n\nUnreleased\n\n${entry}\n`);
+      this.logger.info('Created CHANGELOG.md and appended entry', { entry });
+      return;
+    }
+
+    const content = this.fileManager.readFileSync(CHANGELOG_PATH);
+    const idx = content.indexOf('Unreleased');
+    if (idx === -1) {
+      // append at top
+      const newContent = `# Changelog\n\nUnreleased\n\n${entry}\n\n${content}`;
+      this.fileManager.writeFileSync(CHANGELOG_PATH, newContent);
+      return;
+    }
+
+    // find end of line after Unreleased heading
+    const after = content.indexOf('\n', idx);
+    const insertPos = after + 1;
+    const newContent = `${content.slice(0, insertPos)}- ${entry}\n${content.slice(insertPos)}`;
+    this.fileManager.writeFileSync(CHANGELOG_PATH, newContent);
+    this.logger.info('Appended entry to CHANGELOG.md', { entry });
+  }
+
+  /**
+   * Previews the completion of a task without actually performing the action.
+   */
+  previewComplete(id: string): string {
+    const task = this.findTaskById(id);
+    if (isNullOrUndefined(task)) {
+      return `Task ${id} not found`;
+    }
+    const lines: string[] = [];
+    lines.push(`Will remove task ${id} from TODO.md`);
+    lines.push(
+      `Will append to CHANGELOG.md Unreleased: ${task.id} — ${task['summary'] ?? 'No summary'}`,
+    );
+    return lines.join('\n');
+  }
 }

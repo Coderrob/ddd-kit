@@ -1,10 +1,11 @@
 import chalk from 'chalk';
 import { Command } from 'commander';
 
-import { ILogger } from '../../types/ILogger';
-import { findTaskById } from '../../core/storage/todo';
-import { TodoShowCommandArgs } from '../../types/command-options';
+import { ILogger } from '../../types/observability';
+import { TodoManager } from '../../core/storage/todo';
 import { EXIT_CODES } from '../../constants/exit-codes';
+import { BaseCommand } from '../shared/base.command';
+import { CommandName } from '../../types';
 
 interface TaskDetails {
   detailed_requirements?: unknown;
@@ -12,22 +13,33 @@ interface TaskDetails {
 }
 
 /**
+ * Arguments for the 'todo show' command
+ */
+export interface TodoShowCommandArgs {
+  /** Task ID to show */
+  id: string;
+}
+
+/**
  * Modern command for showing detailed information about a specific task.
  */
-export class ShowTaskCommand {
-  constructor(private readonly logger: ILogger) {}
+export class ShowTaskCommand extends BaseCommand {
+  readonly name = CommandName.SHOW;
+  readonly description = 'Show details of a specific task';
 
   /**
    * Executes the show task command.
    * Displays detailed information about a task including its status, owner, requirements, and validations.
    */
   execute(args: TodoShowCommandArgs): Promise<void> {
-    const task = findTaskById(args.id, this.logger);
+    const todoManager = new TodoManager(this.logger);
+    const task = todoManager.findTaskById(args.id);
 
     if (!task) {
-      this.logger.error(`Task ${args.id} not found`, { id: args.id });
+      const message = `Task ${args.id} not found`;
+      this.logger.error(message, { id: args.id });
       process.exitCode = EXIT_CODES.NOT_FOUND;
-      return Promise.resolve();
+      return Promise.reject(message);
     }
 
     this.logger.info('Task details displayed', { id: args.id, title: task.title });
@@ -50,13 +62,12 @@ export class ShowTaskCommand {
       console.log('(invalid or missing validations)');
       this.logger.warn('Invalid validations in task', { id: args.id });
     }
-
     return Promise.resolve();
   }
 
   static configure(parent: Command, logger: ILogger): void {
     parent
-      .command('show')
+      .command(CommandName.SHOW)
       .argument('<id>', 'Task ID to show')
       .description('Show details of a specific task')
       .action(async (id: string) => {

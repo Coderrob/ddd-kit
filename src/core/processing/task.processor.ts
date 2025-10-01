@@ -1,24 +1,17 @@
-import { IExclusionFilter } from '../../types/IExclusionFilter';
-import { ITaskFixer } from '../../types/ITaskFixer';
-import { ITaskValidator } from '../../types/ITaskValidator';
-import { IValidationResultBuilder } from '../../types/IValidationResultBuilder';
-import { ITask } from '../../types/ITask';
+import { IExclusionFilter } from '../../types/repository';
+import { ITaskFixer, ITask } from '../../types/tasks';
+import { IValidationResultBuilder } from '../../types/validation';
 import { ValidationContext } from '../../validators/validation.context';
+import { TaskPersistenceService } from '../services/task-persistence.service';
+import { TaskValidationService } from '../services/task-validation-processor.service';
 
 /**
  * Processes individual tasks for validation and fixing.
+ * Follows Single Responsibility Principle (SRP) and Dependency Inversion Principle (DIP).
  *
- * This class is responsible for orchestrating the validation and fixing process
- * for individual tasks. It coordinates between validators, fixers, exclusion filters,
- * and result builders to ensure comprehensive task processing.
- *
- * The processor handles:
- * - Task validation against schema requirements
- * - Automatic application of fixes for common issues
- * - Exclusion filtering based on patterns
- * - Result collection and reporting
+ * This class orchestrates the validation and fixing process by delegating
+ * specific responsibilities to dedicated service classes.
  */
-
 export class TaskProcessor {
   /**
    * Creates a new TaskProcessor instance.
@@ -26,11 +19,12 @@ export class TaskProcessor {
    */
   constructor(
     private readonly options: {
-      validator: ITaskValidator;
       fixer: ITaskFixer;
       exclusionFilter: IExclusionFilter;
       resultBuilder: IValidationResultBuilder;
       context: ValidationContext;
+      validationService: TaskValidationService;
+      persistenceService: TaskPersistenceService;
     },
   ) {}
 
@@ -49,8 +43,14 @@ export class TaskProcessor {
    * @returns Promise that resolves when task processing is complete
    */
   async processTask(task: unknown, index: number): Promise<void> {
-    const taskObj = { ...(task as Record<string, unknown>) };
-    const taskId = String(taskObj['id'] ?? '');
+    if (!this.isITask(task)) {
+      this.options.resultBuilder.addError(`Task[${index}] is not a valid ITask shape`);
+      return;
+    }
+
+    // Work on a shallow copy to avoid unexpected external mutation
+    const taskObj: ITask = { ...task };
+    const taskId = taskObj.id;
 
     // Check exclusion filter
     if (this.options.exclusionFilter.shouldExclude(taskObj)) {
@@ -66,11 +66,8 @@ export class TaskProcessor {
     // Apply fixes to ensure all tasks have required default values
     await this.applyFixes(taskObj, taskId, index);
 
-    // Validate the task after fixes
-    const validationResult = this.options.validator.validate(taskObj);
-    if (!validationResult.ok) {
-      this.addValidationError(index, validationResult);
-    }
+    // Validate the task after fixes using the validation service
+    this.options.validationService.validateTask(taskObj, index);
   }
 
   /**
@@ -92,104 +89,27 @@ export class TaskProcessor {
    * await this.applyFixes(taskObj, 'TASK-123', 0);
    * ```
    */
-  private async applyFixes(
-    taskObj: Record<string, unknown>,
-    taskId: string,
-    index: number,
-  ): Promise<void> {
+  private async applyFixes(taskObj: ITask, taskId: string, index: number): Promise<void> {
     const localFixes = this.options.fixer.applyBasicFixes(taskObj);
 
     if (localFixes.length > 0) {
       this.options.resultBuilder.addFixes(localFixes);
 
       if (this.options.context.options.applyFixes) {
-        await this.persistFixes(taskId, taskObj);
+        const success = await this.options.persistenceService.persistTask(taskId, taskObj);
+        if (success) {
+          this.options.resultBuilder.incrementFixesApplied();
+        }
       }
 
-      this.revalidateAfterFixes(taskObj, index);
+      this.options.validationService.revalidateAfterFixes(taskObj, index);
     }
   }
 
-  /**
-   * Persists task fixes to the task store.
-   *
-   * This private method saves the modified task object back to persistent storage
-   * using the task store from the validation context.
-   *
-   * @param taskId - The unique identifier of the task to update
-   * @param taskObj - The updated task object with applied fixes
-   * @returns Promise that resolves to true if the update was successful, false otherwise
-   *
-   * @example
-   * ```typescript
-   * const success = await this.persistFixes('TASK-123', modifiedTaskObj);
-   * if (success) {
-   *   console.log('Task saved successfully');
-   * }
-   * ```
-   */
-  private async persistFixes(taskId: string, taskObj: Record<string, unknown>): Promise<boolean> {
-    const taskStore = this.options.context.getTaskStore();
-    const result = await taskStore.updateTaskById(taskId, taskObj as ITask);
-    return result;
-  }
-
-  /**
-   * Re-validates a task after fixes have been applied.
-   *
-   * This private method performs validation on a task that has already been
-   * processed by the fixer to ensure that the fixes resolved all validation
-   * issues. Any remaining validation errors are recorded for reporting.
-   *
-   * @param taskObj - The task object to re-validate after fixes
-   * @param index - The index of this task in the processing batch (for error reporting)
-   *
-   * @example
-   * ```typescript
-   * this.revalidateAfterFixes(fixedTaskObj, 0);
-   * ```
-   */
-  private revalidateAfterFixes(taskObj: Record<string, unknown>, index: number): void {
-    const recheck = this.options.validator.validate(taskObj);
-    if (!recheck.ok) {
-      const msg = (recheck.errors || [])
-        .map((e: unknown) => {
-          const error = e as { instancePath?: string; message?: string };
-          return `${error.instancePath ?? ''} ${error.message ?? ''}`;
-        })
-        .join('; ');
-      this.options.resultBuilder.addError(`Task[${index}] validation failed after fixes: ${msg}`);
-    }
-  }
-
-  /**
-   * Adds a validation error to the result builder.
-   *
-   * This private method formats validation errors from the validator into
-   * human-readable error messages and adds them to the result builder for
-   * later reporting.
-   *
-   * @param index - The index of the task in the processing batch
-   * @param validationResult - The validation result containing error details
-   * @param validationResult.ok - Whether validation passed
-   * @param validationResult.errors - Array of validation error objects
-   *
-   * @example
-   * ```typescript
-   * const result = { ok: false, errors: [{ instancePath: '/title', message: 'is required' }] };
-   * this.addValidationError(0, result);
-   * ```
-   */
-  private addValidationError(
-    index: number,
-    validationResult: { ok: boolean; errors?: unknown[] },
-  ): void {
-    const msg = (validationResult.errors || [])
-      .map((e: unknown) => {
-        const error = e as { instancePath?: string; message?: string };
-        return `${error.instancePath ?? ''} ${error.message ?? ''}`;
-      })
-      .join('; ');
-    this.options.resultBuilder.addError(`Task[${index}] validation failed: ${msg}`);
+  /** Type guard to ensure a value conforms to ITask minimally by id being a string. */
+  private isITask(value: unknown): value is ITask {
+    if (typeof value !== 'object' || value === null) return false;
+    const obj = value as { id?: unknown };
+    return typeof obj.id === 'string' && obj.id.length > 0;
   }
 }

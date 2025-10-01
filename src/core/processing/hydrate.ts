@@ -1,9 +1,14 @@
-import type { ITask, IResolvedRef, IHydrationOptions } from '../../types/ITask';
-import { TaskProviderType } from '../../types';
+import { createHash } from 'crypto';
+
+import type {
+  ITask,
+  IResolvedRef,
+  IHydrationOptions,
+  ITaskHydrationUseCase,
+} from '../../types/tasks';
+import { ILogger, TaskProviderType } from '../../types';
 import { UidStatusError } from '../../errors/uid-status.error';
 import { UidResolutionError } from '../../errors/uid-resolution.error';
-import type { ITaskHydrationUseCase } from '../../types/ITaskHydrationUseCase';
-import { getLogger } from '../system/logger';
 import { Resolver } from '../helpers/uid-resolver';
 import { Renderer } from '../rendering/renderer';
 import { TaskProviderFactory } from '../storage/task-provider.factory';
@@ -12,36 +17,13 @@ export class TaskHydrationService implements ITaskHydrationUseCase {
   constructor(
     private readonly resolver: Resolver,
     private readonly renderer: Renderer,
+    private readonly logger: ILogger,
   ) {}
 
-  hydrateTask(task: ITask, _dddKitPath: string, _targetPath: string, pin?: string): Promise<void> {
-    const log = getLogger();
-    log.info('Hydrating task', { taskId: task.id });
+  hydrateTask(task: ITask, _dddKitPath: string, _targetPath: string, pin?: string): Promise<ITask> {
+    this.logger.info('Hydrating task', { taskId: task.id });
 
-    const resolvedRefs: IResolvedRef[] = [];
-
-    const references = (task as Record<string, unknown>)['references'] as string[] | undefined;
-    if (references) {
-      for (const ref of references) {
-        try {
-          const resolved = this.resolver.resolve(ref);
-          if (!resolved) {
-            throw new UidResolutionError(ref);
-          }
-          if (resolved.status !== 'active') {
-            throw new UidStatusError(ref, resolved.status);
-          }
-          resolvedRefs.push({
-            content: resolved.content,
-            contentHash: this.generateContentHash(resolved.content),
-            uid: ref,
-          });
-        } catch (error) {
-          log.error(`Failed to resolve ${ref}`, { error: String(error) });
-          throw error;
-        }
-      }
-    }
+    const resolvedRefs = this.resolveReferences(task);
 
     const provenance = {
       actionRunId: process.env['GITHUB_RUN_ID'] ?? 'manual-run',
@@ -49,25 +31,56 @@ export class TaskHydrationService implements ITaskHydrationUseCase {
     };
 
     this.renderer.render(task.id, resolvedRefs, provenance);
-    return Promise.resolve();
+
+    // Set resolved references on the task
+    task.resolvedReferences = resolvedRefs.map((ref) => ({
+      contentHash: ref.contentHash ?? '',
+      resolvedAt: new Date().toISOString(),
+      uid: ref.uid,
+    }));
+
+    return Promise.resolve(task);
+  }
+
+  private resolveReferences(task: ITask): IResolvedRef[] {
+    const resolvedRefs: IResolvedRef[] = [];
+
+    const references = task.references;
+    if (!references) {
+      return resolvedRefs;
+    }
+
+    for (const ref of references) {
+      try {
+        const resolved = this.resolver.resolve(ref);
+        if (!resolved) {
+          throw new UidResolutionError(ref);
+        }
+        if (resolved.status !== 'active') {
+          throw new UidStatusError(ref, resolved.status);
+        }
+        resolvedRefs.push({
+          content: resolved.content,
+          contentHash: this.generateContentHash(resolved.content),
+          uid: ref,
+        });
+      } catch (error) {
+        this.logger.error(`Failed to resolve ${ref}`, { error: String(error) });
+        throw error;
+      }
+    }
+
+    return resolvedRefs;
   }
 
   /**
-   * Implements ITaskHydrationUseCase.execute - hydrate the next eligible task if available
+   * Hydrates the next eligible task based on the provided options.
+   * @param options - hydration options
+   * @returns the hydrated task
+   * @throws Error if no eligible task is found to hydrate
    */
   async execute(options: IHydrationOptions): Promise<ITask> {
-    let providerType: TaskProviderType;
-    switch (options.provider) {
-      case 'issues':
-        providerType = TaskProviderType.ISSUES;
-        break;
-      case 'projects':
-        providerType = TaskProviderType.PROJECTS;
-        break;
-      default:
-        providerType = TaskProviderType.TODO;
-    }
-    const provider = TaskProviderFactory.create(providerType);
+    const provider = this.createProvider(options.provider);
     const next = await provider.findNextEligible(options.filters);
     if (!next) {
       throw new Error('No eligible task found to hydrate');
@@ -76,31 +89,29 @@ export class TaskHydrationService implements ITaskHydrationUseCase {
     return next;
   }
 
-  private generateContentHash(content: string): string {
-    // Simple hash for content integrity - in production, use crypto.createHash
-    let hash = 0;
-    for (let i = 0; i < content.length; i++) {
-      const char = content.charCodeAt(i);
-      hash = (hash * 31 + char) % 0x100000000; // Simple polynomial hash
+  /**
+   * Creates a task provider based on the specified type.
+   * @param providerType - optional provider type to create, defaults to TODO
+   * @returns the created provider instance
+   */
+  private createProvider(providerType?: string) {
+    switch (providerType) {
+      case TaskProviderType.ISSUES:
+      case TaskProviderType.PROJECTS:
+        return TaskProviderFactory.create(providerType, this.logger);
+
+      default:
+        return TaskProviderFactory.create(TaskProviderType.TODO, this.logger);
     }
-    return Math.abs(hash).toString(16);
   }
-}
 
-/**
- * Legacy function for backward compatibility.
- * TODO: Refactor callers to use TaskHydrationService directly.
- */
-export function hydrateTask(
-  task: ITask,
-  dddKitPath: string,
-  targetPath: string,
-  pin?: string,
-): Promise<void> {
-  const resolver = new Resolver(dddKitPath);
-  const renderer = new Renderer(targetPath);
-  const service = new TaskHydrationService(resolver, renderer);
-
-  service.hydrateTask(task, dddKitPath, targetPath, pin);
-  return Promise.resolve();
+  /**
+   * Generates a SHA-256 hash of the given content.
+   * @param content - The content to hash.
+   * @returns The SHA-256 hash as a hex string.
+   */
+  private generateContentHash(content: string): string {
+    // Use crypto.createHash for production content integrity
+    return createHash('sha256').update(content).digest('hex');
+  }
 }

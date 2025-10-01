@@ -40,7 +40,7 @@ module.exports = {
     '@typescript-eslint/strict-boolean-expressions': 'error',
     '@typescript-eslint/no-confusing-void-expression': 'error',
     '@typescript-eslint/prefer-readonly': 'error',
-    '@typescript-eslint/prefer-readonly-parameter-types': 'off', // Too strict for current codebase
+    '@typescript-eslint/prefer-readonly-parameter-types': 'off',
 
     'import/no-unresolved': 'error',
     // 'import/no-cycle': 'error',
@@ -57,7 +57,7 @@ module.exports = {
     ],
 
     // Sorting and ordering rules
-    'sort-keys': ['warn', 'asc', { caseSensitive: false, natural: true }],
+    'sort-keys': 'off', // Disabled to avoid conflicts with object properties
     'sort-vars': 'error',
     '@typescript-eslint/member-ordering': [
       'error',

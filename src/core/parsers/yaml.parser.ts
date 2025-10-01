@@ -1,11 +1,11 @@
-import path from 'path';
+import * as path from 'path';
 
-import { load, dump } from 'js-yaml';
+import { load, dump, JSON_SCHEMA } from 'js-yaml';
 
-import { ILogger } from '../../types/ILogger';
-import { IFileManager } from '../../types/IFileManager';
+import { ILogger } from '../../types/observability';
+import { IFileManager } from '../../types/core';
 import { getLogger } from '../system/logger';
-import { isNonEmptyString, isNullOrUndefined } from '../helpers/type-guards';
+import { isNonEmptyString, isObject } from '../helpers/type-guards';
 
 /**
  * Extracts YAML blocks from markdown content.
@@ -30,12 +30,18 @@ export function extractYamlBlocks(md: string): string[] {
  * @param logger - Optional logger.
  * @returns The parsed object or null if failed.
  */
-export function parseYamlBlock(block: string, logger?: ILogger): Record<string, unknown> | null {
+export function parseYamlBlock<T extends Record<string, unknown>>(
+  block: string,
+  logger?: ILogger,
+): T | null {
   const log = logger ?? getLogger();
   try {
-    const parsed = load(block);
-    if (!isNullOrUndefined(parsed) && typeof parsed === 'object') {
-      return parsed as Record<string, unknown>;
+    // Configure js-yaml to NOT parse timestamps as Date objects, keep them as strings
+    const parsed = load(block, {
+      schema: JSON_SCHEMA, // Use JSON schema which doesn't auto-convert dates
+    });
+    if (isObject(parsed)) {
+      return parsed as T;
     }
   } catch (e) {
     log.warn('Failed to parse YAML block', { error: String(e) });
@@ -70,18 +76,31 @@ export function addYamlBlockFromFile(
   const abs = path.isAbsolute(sourceFilePath)
     ? sourceFilePath
     : path.join(process.cwd(), sourceFilePath);
-  if (!fileSystem.existsSync(abs)) return false;
+  if (!fileSystem.existsSync(abs)) {
+    return false;
+  }
 
   const content = fileSystem.readFileSync(abs);
   // find first YAML block in file
   const pattern = /---\r?\n([\s\S]*?)\r?\n---/;
   const m = content.match(pattern);
-  if (!m) return false;
+  if (!m) {
+    return false;
+  }
 
   const block = m[0];
-  // append to target file with a blank line separator
+  // append to target file with proper document separator
   const targetContent = fileSystem.readFileSync(targetFilePath);
-  const newContent = targetContent + '\n' + block + '\n';
+  // Ensure target content ends with document separator
+  const separator = '\n---\n';
+  let newContent: string;
+  if (targetContent.endsWith('\n')) {
+    // Target already ends with newline, just add the block
+    newContent = targetContent + block + '\n';
+  } else {
+    // Target doesn't end with newline, add separator
+    newContent = targetContent + separator + block + '\n';
+  }
   fileSystem.writeFileSync(targetFilePath, newContent);
   log.info('Appended YAML block to file', { src: sourceFilePath, target: targetFilePath });
   return true;
@@ -174,25 +193,31 @@ export function updateYamlBlockById(options: UpdateYamlBlockOptions): boolean {
  */
 export function removeYamlBlockById(
   filePath: string,
-  id: string,
   fileSystem: IFileManager,
+  id: string,
   logger?: ILogger,
 ): boolean {
   const log = logger ?? getLogger();
   try {
     const content = fileSystem.readFileSync(filePath);
-    const parts = content.split(/---\r?\n/);
+
+    // Find the YAML block with the matching ID
+    const blockPattern = /---\r?\n([\s\S]*?)\r?\n---/g;
+    let match;
+    let newContent = content;
     let found = false;
 
-    for (let i = 1; i < parts.length; i += 2) {
-      // eslint-disable-next-line security/detect-object-injection
-      const yamlContent = parts[i];
-      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-      if (yamlContent) {
+    while ((match = blockPattern.exec(content)) !== null) {
+      const fullBlock = match[0]; // The complete ---YAML--- block
+      const yamlContent = match[1]; // Just the YAML content
+
+      if (isNonEmptyString(yamlContent)) {
         const parsed = parseYamlBlock(yamlContent, log);
         if (parsed && parsed['id'] === id) {
-          // Remove this block and its closing ---
-          parts.splice(i - 1, 3);
+          // Remove the entire block including markers and surrounding whitespace
+          newContent = newContent.replace(fullBlock, '');
+          // Clean up extra newlines
+          newContent = newContent.replace(/\n{3,}/g, '\n\n');
           found = true;
           break;
         }
@@ -204,7 +229,6 @@ export function removeYamlBlockById(
       return false;
     }
 
-    const newContent = parts.join('---\n');
     fileSystem.writeFileSync(filePath, newContent);
     log.info(`Removed YAML block with ID ${id}`);
     return true;

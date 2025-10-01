@@ -1,11 +1,14 @@
 import { Command } from 'commander';
 
-import { ValidateFixCommandOptions } from '../../types/command-options';
-import { FixRecord } from '../../types/FixRecord';
-import { ILogger } from '../../types/ILogger';
-import { listTasks } from '../../core/storage/todo';
+import { ValidateFixCommandOptions } from '../../types/validation';
+import { FixRecord } from '../../types/tasks';
+import { ILogger } from '../../types/observability';
+import { TodoManager } from '../../core/storage/todo';
 import { validateAndFixTasks } from '../../validators/validator';
 import { ValidationResultRenderer } from '../../core/rendering/validation-result.renderer';
+import { isNonEmptyString } from '../../core/helpers/type-guards';
+import { EXIT_CODES } from '../../constants/exit-codes';
+import { BaseCommand } from '../shared/base.command';
 
 /**
  * Modern command for validating tasks and optionally applying automatic fixes.
@@ -14,11 +17,17 @@ import { ValidationResultRenderer } from '../../core/rendering/validation-result
  * for the DDD-Kit task management system. It can validate tasks against the schema,
  * apply automatic fixes for common issues, and provide detailed reporting in various formats.
  */
-export class ValidateAndFixCommand {
+export class ValidateAndFixCommand extends BaseCommand {
+  override name = 'fix';
+  override description = 'Validate and fix tasks';
+
   constructor(
-    private readonly logger: ILogger,
+    logger: ILogger,
     private readonly renderer: ValidationResultRenderer,
-  ) {}
+  ) {
+    super(logger);
+  }
+
   /**
    * Executes the validate and fix command.
    *
@@ -48,13 +57,14 @@ export class ValidateAndFixCommand {
    * Performs the validation and fixing operation.
    */
   private performValidation(options: ValidateFixCommandOptions) {
+    const todoManager = new TodoManager(this.logger);
     const validationOptions: Parameters<typeof validateAndFixTasks>[1] = {
       applyFixes: Boolean(options.fix) && options.dryRun !== true,
     };
-    if (typeof options.exclude === 'string' && options.exclude.length > 0) {
+    if (isNonEmptyString(options.exclude)) {
       validationOptions.excludePattern = options.exclude;
     }
-    return validateAndFixTasks(listTasks(), validationOptions);
+    return validateAndFixTasks(todoManager.listTasks(), validationOptions);
   }
 
   /**
@@ -76,7 +86,8 @@ export class ValidateAndFixCommand {
     }
 
     // Use renderer for all output
-    this.renderer.render(options, res, listTasks().length);
+    const todoManager = new TodoManager(this.logger);
+    this.renderer.render(options, res, todoManager.listTasks().length);
   }
 
   /**
@@ -86,7 +97,7 @@ export class ValidateAndFixCommand {
     this.logger.error('Remaining validation errors:');
     for (const e of errors) this.logger.error(`- ${e}`);
     this.logger.error('Validation errors remain after fixes', { errorCount: errors.length });
-    process.exitCode = 5;
+    process.exitCode = EXIT_CODES.FIX_FAILED;
   }
 
   static configure(parent: Command, logger: ILogger): void {

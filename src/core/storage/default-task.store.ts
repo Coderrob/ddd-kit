@@ -1,19 +1,56 @@
 import { ITaskStore, ITask } from '../../types';
 
-import { updateTaskById } from './todo';
+import { TodoManager } from './todo';
 
 /**
- * Default implementation of ITaskStore that uses the todo module functions.
+ * Default implementation of ITaskStore that uses the TodoManager class.
  */
 export class DefaultTaskStore implements ITaskStore {
+  private readonly todoManager: TodoManager;
+
+  constructor() {
+    this.todoManager = new TodoManager();
+  }
+
   /**
-   * Updates a task by its ID using the todo module's updateTaskById function.
-   * @param id - The task ID to update.
-   * @param task - The updated Task object.
-   * @returns A Promise that resolves to true if the update was successful, false otherwise.
+   * Lists all tasks from the TODO.md file.
    */
-  updateTaskById(id: string, task: ITask): Promise<boolean> {
-    const result = updateTaskById(id, task);
-    return Promise.resolve(result);
+  listTasks(): ITask[] {
+    return this.todoManager.listTasks();
+  }
+
+  /**
+   * Finds a task by its ID from the TODO.md file.
+   */
+  findTaskById(id: string): ITask | null {
+    return this.todoManager.findTaskById(id);
+  }
+
+  /**
+   * Adds a task from a file to the TODO.md file.
+   */
+  addTaskFromFile(filePath: string): boolean {
+    return this.todoManager.addTaskFromFile(filePath);
+  }
+
+  /**
+   * Updates a task by its ID using the TodoManager.
+   */
+  updateTaskById(id: string, task: ITask): boolean {
+    return this.todoManager.updateTaskById(id, task);
+  }
+
+  /**
+   * Removes a task by ID from the TODO.md file.
+   */
+  removeTaskById(id: string): boolean {
+    return this.todoManager.removeTaskById(id);
+  }
+
+  /**
+   * Previews the completion of a task without actually performing the action.
+   */
+  previewComplete(id: string): string {
+    return this.todoManager.previewComplete(id);
   }
 }

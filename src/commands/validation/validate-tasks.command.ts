@@ -1,9 +1,9 @@
-import chalk from 'chalk';
 import { Command } from 'commander';
 
-import { listTasks } from '../../core/storage/todo';
-import { ILogger } from '../../types/ILogger';
+import { TodoManager } from '../../core/storage/todo';
+import { ILogger } from '../../types/observability';
 import { validateTasks } from '../../validators/validator';
+import { BaseCommand } from '../shared/base.command';
 
 /**
  * Modern command for validating all tasks in TODO.md against the task schema.
@@ -19,13 +19,9 @@ import { validateTasks } from '../../validators/validator';
  * await command.execute();
  * ```
  */
-export class ValidateTasksCommand {
-  /**
-   * Creates a new ValidateTasksCommand instance.
-   *
-   * @param logger - Logger instance for command execution logging
-   */
-  constructor(private readonly logger: ILogger) {}
+export class ValidateTasksCommand extends BaseCommand {
+  override name = 'validate';
+  override description = 'Validate all tasks';
 
   /**
    * Executes the validate tasks command.
@@ -47,17 +43,16 @@ export class ValidateTasksCommand {
    * ```
    */
   execute(): Promise<void> {
-    const tasks = listTasks(this.logger);
+    const todoManager = new TodoManager(this.logger);
+    const tasks = todoManager.listTasks();
     const result = validateTasks(tasks);
 
     if (result.valid) {
-      console.log(chalk.green(`All ${tasks.length} tasks validate against schema`));
-      this.logger.info('All tasks validated successfully', { taskCount: tasks.length });
+      this.logger.info(`All ${tasks.length} tasks validate against schema`);
       return Promise.resolve();
     }
 
     this.logger.error('Validation errors:');
-    this.logger.error('Task validation failed', { errorCount: result.errors?.length ?? 0 });
     for (const error of result.errors ?? []) {
       this.logger.error(`- ${error}`);
     }
@@ -82,7 +77,7 @@ export class ValidateTasksCommand {
    */
   static configure(parent: Command, logger: ILogger): void {
     parent
-      .command('tasks')
+      .command('validate')
       .description('Validate all tasks')
       .action(async () => {
         const cmd = new ValidateTasksCommand(logger);

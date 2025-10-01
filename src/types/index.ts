@@ -1,29 +1,25 @@
-export * from './command-options';
-export * from './FixRecord';
-export * from './ICommand';
-export * from './IContainer';
-export * from './IContentRenderer';
-export * from './IExclusionFilter';
-export * from './IFileManager';
-export * from './IFixerOptions';
-export * from './ILogger';
-export * from './IReferenceAuditResult';
-export * from './IReferenceAuditUseCase';
-export * from './IRenderer';
-export * from './IResolvedUid';
-export * from './IResolver';
-export * from './ITask';
-export * from './ITaskFixer';
-export * from './ITaskHydrationUseCase';
-export * from './ITaskRenderUseCase';
-export * from './ITaskRepository';
-export * from './ITaskStore';
-export * from './ITaskValidator';
-export * from './IUIdSupersedeUseCase';
-export * from './IUidRepository';
-export * from './IValidationResult';
-export * from './IValidationResultBuilder';
-export * from './OutputFormat';
-export * from './TaskPriority';
-export * from './TaskProviderType';
-export * from './TaskStatus';
+// Feature-based type exports - grouped by domain responsibility
+
+// Core infrastructure and cross-cutting concerns
+export * from './core';
+
+// Task management domain
+export * from './tasks';
+
+// Command execution framework
+export * from './commands';
+
+// Validation framework
+export * from './validation';
+
+// Content and output rendering
+export * from './rendering';
+
+// Reference auditing and UID management
+export * from './audit';
+
+// Data access and repository patterns
+export * from './repository';
+
+// Logging and observability
+export * from './observability';

@@ -1,7 +1,7 @@
-import type { IReferenceAuditUseCase } from '../types/IReferenceAuditUseCase';
-import type { IReferenceAuditResult } from '../types/IReferenceAuditResult';
-import type { IResolver } from '../types/IResolver';
+import type { IReferenceAuditUseCase, IReferenceAuditResult } from '../types/audit';
+import type { IResolver } from '../types/repository';
 import { isNullOrUndefined } from '../core/helpers/type-guards';
+import { UidStatus } from '../types/audit';
 
 export class ReferenceAuditService implements IReferenceAuditUseCase {
   constructor(private readonly resolver: IResolver) {}
@@ -22,9 +22,9 @@ export class ReferenceAuditService implements IReferenceAuditUseCase {
         continue;
       }
       totalReferences += entry.requires.length;
-      if (entry.status === 'deprecated') {
+      if (entry.status === UidStatus.DEPRECATED) {
         deprecatedUids.push(uid);
-      } else if (entry.status === 'archived') {
+      } else if (entry.status === UidStatus.ARCHIVED) {
         archivedUids.push(uid);
       }
     }

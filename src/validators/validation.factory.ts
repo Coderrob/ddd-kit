@@ -1,9 +1,8 @@
-import { ITaskValidator } from '../types/ITaskValidator';
-import { ILogger } from '../types/ILogger';
-import { ITaskFixer } from '../types/ITaskFixer';
-import { IExclusionFilter } from '../types/IExclusionFilter';
-import { IValidationResultBuilder } from '../types/IValidationResultBuilder';
-import { TaskFixer } from '../core/processing/task-fixer';
+import { ILogger } from '../types/observability';
+import { IExclusionFilter } from '../types/repository';
+import { ITaskFixer, ITaskValidator } from '../types/tasks';
+import { IValidationResultBuilder } from '../types/validation';
+import { TaskFixer } from '../core/fixers/task.fixer';
 import { ExclusionFilter } from '../core/processing/exclusion.filter';
 
 import { SchemaLoader } from './schema.loader';

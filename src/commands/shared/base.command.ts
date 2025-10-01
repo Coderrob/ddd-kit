@@ -1,15 +1,10 @@
-import { ICommand } from '../../types/ICommand';
-import { ILogger } from '../../types/ILogger';
-import { getLogger } from '../../core/system/logger';
+import { ICommand, ILogger } from '../../types';
 
 export abstract class BaseCommand implements ICommand {
   abstract name: string;
+  abstract description: string;
 
-  protected logger: ILogger;
-
-  constructor(logger?: ILogger) {
-    this.logger = logger ?? getLogger();
-  }
+  constructor(protected readonly logger: ILogger) {}
 
   protected logInfo(message: string): void {
     console.log(message);
@@ -20,5 +15,5 @@ export abstract class BaseCommand implements ICommand {
     this.logger.error(message);
   }
 
-  abstract execute(args?: Record<string, unknown>): Promise<void>;
+  abstract execute(args?: unknown): Promise<void>;
 }

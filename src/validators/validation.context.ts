@@ -1,7 +1,7 @@
 import { DefaultTaskStore } from '../core/storage/default-task.store';
 import { getLogger } from '../core/system/logger';
-import { ITaskStore } from '../types/ITaskStore';
-import { ILogger } from '../types/ILogger';
+import { ITaskStore } from '../types/tasks';
+import { ILogger } from '../types/observability';
 
 /**
  * Context object for task validation operations.

@@ -57,16 +57,18 @@
   "name": "@coderrob/ddd-kit",
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "cli": "node dist/cli.js",
     "dev": "ts-node src/cli.ts",
+    "duplicate-check": "jscpd --min-lines 10 --min-tokens 30 --threshold 1 src/",
     "format": "prettier --write '**/*.{ts,js,json,md,mdx,mdown,markdown,yml,yaml}'",
     "format:check": "prettier --check '**/*.{ts,js,json,md,mdx,mdown,markdown,yml,yaml}'",
+    "integration-test": "bash scripts/integration-test.sh",
     "lint": "eslint src/**/*.{ts,js}",
     "lint:ci": "eslint src/**/*.{ts,js} --max-warnings=0",
     "lint:fix": "eslint src/**/*.{ts,js} --fix",
     "prepare": "husky install",
-    "cli": "node dist/cli.js",
-    "duplicate-check": "jscpd --min-lines 10 --min-tokens 50 --threshold 1 src/",
-    "test": "jest --runInBand --coverage"
+    "test": "jest --runInBand --coverage",
+    "validate-local": "node scripts/validate-local.mjs"
   },
   "version": "0.1.0"
 }

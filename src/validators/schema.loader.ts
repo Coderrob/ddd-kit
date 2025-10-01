@@ -1,4 +1,4 @@
-import path from 'path';
+import * as path from 'path';
 
 import { FileManager } from '../core/storage/file-manager';
 import { parseJsonFile } from '../core/parsers/json.parser';
@@ -25,8 +25,9 @@ export class SchemaLoader {
    */
   load(): unknown {
     const fileManager = new FileManager();
-    if (!fileManager.existsSync(this.schemaPath))
+    if (!fileManager.existsSync(this.schemaPath)) {
       throw new Error('Schema file not found: ' + this.schemaPath);
+    }
     return parseJsonFile(this.schemaPath, fileManager);
   }
 }

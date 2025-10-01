@@ -1,4 +1,4 @@
-import path from 'path';
+import * as path from 'path';
 
 import { IRenderer, IResolvedRef } from '../../types';
 import { FileManager } from '../storage/file-manager';

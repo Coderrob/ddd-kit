@@ -1,1 +1,8 @@
-{}
+{
+  "auth-service.ts": "tech:typescript/frameworks/express@5.0",
+  "user-model.ts": "tech:typescript/frameworks/express@5.0",
+  "migration-runner.ts": "tech:typescript/frameworks/express@5.0",
+  "schema-validator.ts": "tech:typescript/frameworks/express@5.0",
+  "doc-generator.ts": "tech:typescript/frameworks/express@5.0",
+  "api-parser.ts": "tech:typescript/frameworks/express@5.0"
+}

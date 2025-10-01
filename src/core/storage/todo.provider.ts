@@ -1,12 +1,16 @@
-import { ITask } from '../../types/ITask';
-import { ITaskRepository } from '../../types/ITaskRepository';
+import { ITask } from '../../types/tasks';
+import { ITaskRepository } from '../../types/repository';
+import { ILogger } from '../../types/observability';
 import { isNullOrUndefined } from '../helpers/type-guards';
 
-import { listTasks, updateTaskById } from './todo';
+import { TodoManager } from './todo';
 
 export class TodoProvider implements ITaskRepository {
+  constructor(private readonly logger: ILogger) {}
+
   findById(id: string): Promise<ITask | null> {
-    const tasks = listTasks();
+    const todoManager = new TodoManager(this.logger);
+    const tasks = todoManager.listTasks();
     const task = tasks.find(
       (t) => typeof t === 'object' && (t as Record<string, unknown>)['id'] === id,
     ) as ITask | null;
@@ -14,7 +18,8 @@ export class TodoProvider implements ITaskRepository {
   }
 
   findNextEligible(_filters?: string[]): Promise<ITask | null> {
-    const tasks = listTasks();
+    const todoManager = new TodoManager(this.logger);
+    const tasks = todoManager.listTasks();
     const eligible = tasks.filter(
       (t) =>
         typeof t === 'object' &&
@@ -28,11 +33,13 @@ export class TodoProvider implements ITaskRepository {
   }
 
   update(task: ITask): Promise<void> {
-    updateTaskById(task.id, task);
+    const todoManager = new TodoManager(this.logger);
+    todoManager.updateTaskById(task.id, task);
     return Promise.resolve();
   }
 
   findAll(): Promise<ITask[]> {
-    return Promise.resolve(listTasks() as ITask[]);
+    const todoManager = new TodoManager(this.logger);
+    return Promise.resolve(todoManager.listTasks() as ITask[]);
   }
 }

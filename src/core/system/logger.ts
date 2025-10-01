@@ -1,6 +1,6 @@
 import pino from 'pino';
 
-import { ILogger } from '../../types/ILogger';
+import { ILogger } from '../../types/observability';
 
 import { PinoLogger } from './pino.logger';
 
@@ -29,7 +29,7 @@ export function getLogger(): ILogger {
       process.argv[1]?.endsWith('cli.ts') === true ||
       process.env['NODE_ENV'] === 'cli' ||
       !process.stdout.isTTY;
-    globalLogger = new PinoLogger(void 0, isCli);
+    globalLogger = new PinoLogger(pino(), isCli);
   }
   return globalLogger as ILogger;
 }
@@ -94,27 +94,4 @@ export function createPinoLogger(opts?: pino.LoggerOptions, isCli?: boolean): IL
 
   const logger = pino(opts ?? { level: process.env['LOG_LEVEL'] ?? 'info' });
   return new PinoLogger(logger, false);
-}
-
-/**
- * Creates a CLI-optimized logger instance.
- *
- * Factory function that creates a logger specifically configured for command-line
- * interface usage. Uses pretty-printed output with colors and simplified formatting
- * for better readability in terminal environments.
- *
- * The log level can be controlled via the LOG_LEVEL environment variable,
- * defaulting to 'warn' level.
- *
- * @returns A new ILogger instance configured with CLI-appropriate formatting and colors
- *
- * @example
- * ```typescript
- * const cliLogger = createCliLogger();
- * cliLogger.info('Starting command execution...');
- * cliLogger.warn('This is a warning message');
- * ```
- */
-export function createCliLogger(): ILogger {
-  return createPinoLogger({ level: process.env['LOG_LEVEL'] ?? 'warn' }, true);
 }

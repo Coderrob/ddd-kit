@@ -10,7 +10,7 @@ import { NextCommand } from '../rendering/next.command';
 import { RenderCommand } from '../rendering/render.command';
 import { RefAuditCommand } from '../audit/ref-audit.command';
 import { SupersedeCommand } from '../audit/supersede.command';
-import { ILogger } from '../../types/ILogger';
+import { ILogger } from '../../types/observability';
 
 /**
  * Factory for creating and configuring CLI commands following Command pattern.

@@ -1,4 +1,4 @@
-import { ICommand } from '../../types/ICommand';
+import { ICommand } from '../../types/commands';
 
 /**
  * Registry for managing CLI commands.

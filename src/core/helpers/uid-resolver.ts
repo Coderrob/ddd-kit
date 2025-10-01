@@ -1,12 +1,12 @@
-import path from 'path';
+import * as path from 'path';
 
-import type { IResolver } from '../../types/IResolver';
+import type { IResolver } from '../../types/repository';
 import { FileManager } from '../storage/file-manager';
 import { parseJsonFile } from '../parsers/json.parser';
 
-import { safeGet } from './type-guards';
+import { isString, safeGet } from './type-guards';
 
-export interface RegistryEntry {
+export interface IRegistryEntry {
   path: string;
   status: string;
   sha: string;
@@ -14,8 +14,13 @@ export interface RegistryEntry {
   requires: string[];
 }
 
+export interface RegistryEntryDetails {
+  status: string;
+  requires: string[];
+}
+
 export class Resolver implements IResolver {
-  private registry: Record<string, RegistryEntry | undefined> = {};
+  private registry: Record<string, IRegistryEntry | undefined> = {};
   private aliases: Record<string, string> = {};
   private readonly dddKitPath: string;
 
@@ -38,18 +43,24 @@ export class Resolver implements IResolver {
 
   resolve(uid: string): { path: string; content: string; status: string } | null {
     const actualUidRaw = safeGet(this.aliases, uid);
-    const actualUid = typeof actualUidRaw === 'string' ? actualUidRaw : uid;
-    const entry = safeGet<RegistryEntry>(this.registry, actualUid);
-    if (!entry) return null;
+    const actualUid = isString(actualUidRaw) ? actualUidRaw : uid;
+    const entry = safeGet<IRegistryEntry>(this.registry, actualUid);
+    if (!entry) {
+      return null;
+    }
     const fullPath = path.join(this.dddKitPath, entry.path);
-    if (!FileManager.existsSync(fullPath)) return null;
+    if (!FileManager.existsSync(fullPath)) {
+      return null;
+    }
     const content = FileManager.readFileSync(fullPath);
     return { content, path: entry.path, status: entry.status };
   }
 
   getRequires(uid: string): string[] {
-    const entry = safeGet<RegistryEntry>(this.registry, uid);
-    if (!entry) return [];
+    const entry = safeGet<IRegistryEntry>(this.registry, uid);
+    if (!entry) {
+      return [];
+    }
     return entry.requires;
   }
 
@@ -57,8 +68,8 @@ export class Resolver implements IResolver {
     return Object.keys(this.registry);
   }
 
-  getRegistry(): Record<string, { status: string; requires: string[] } | undefined> {
-    const result: Record<string, { status: string; requires: string[] } | undefined> = {};
+  getRegistry(): Record<string, RegistryEntryDetails | undefined> {
+    const result: Record<string, RegistryEntryDetails | undefined> = {};
     for (const [uid, entry] of Object.entries(this.registry)) {
       if (entry) {
         // eslint-disable-next-line security/detect-object-injection
