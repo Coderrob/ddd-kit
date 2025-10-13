@@ -18,7 +18,32 @@ The Document Driven Development Kit (DDDK) is here to revolutionize the way you 
 - **Responsive interface**: Designed to look and feel amazing on any device.
 - **Synchronized experience**: Pick up right where you left off, no matter where you are.
 
-To dive deeper into the magic of DDDK, check out our [non-existent documentation that is still, ironically, being documented].
+To dive deeper into the magic of DDDK, check out our [documentation](./docs/).
+
+---
+
+## Repository Structure 📁
+
+This repository is organized into clear domains to make navigation intuitive:
+
+```text
+ddd-kit/
+├── toolkit/      # CLI tool source code and builds
+├── reference/    # Standards, tech guides, and validation schemas
+│   ├── standards/  # Process standards and best practices
+│   ├── tech/       # Technology-specific implementation guides
+│   └── schemas/    # JSON validation schemas
+├── docs/         # DDDK usage documentation and guides
+├── examples/     # Example projects and workflows
+└── scripts/      # Development and build utilities
+```
+
+### Quick Navigation
+
+- **Want to use the toolkit?** → Start with installation below, see [toolkit/](./toolkit/) for code
+- **Need reference materials?** → Browse [reference/](./reference/) for standards and tech guides
+- **Learning DDDK?** → Check out [docs/](./docs/) for guides and documentation
+- **Want examples?** → See [examples/](./examples/) for sample projects
 
 ---
 

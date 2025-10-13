@@ -1,6 +1,6 @@
 module.exports = {
   root: true,
-  ignorePatterns: ['*.config.js', '*.config.cjs', 'tools/ci-scripts/**/*'],
+  ignorePatterns: ['*.config.js', '*.config.cjs', 'scripts/ci-scripts/**/*'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2020,
@@ -27,7 +27,7 @@ module.exports = {
     '*.config.ts',
     'webpack.config.js',
     'webpack.config.ts',
-    'tools/ci-scripts/**/*',
+    'scripts/ci-scripts/**/*',
   ],
   rules: {
     // Prettier integration

@@ -1,6 +1,6 @@
 # Documentation
 
-This directory contains the comprehensive documentation corpus for the Document Driven Development Kit (DDDK).
+This directory contains usage documentation and guides for the Document Driven Development Kit (DDDK).
 
 ## 📁 Structure
 
@@ -15,24 +15,25 @@ docs/
 ├── templates/          # Reusable document templates
 │   ├── task-template.md    # Standard task format
 │   └── task-schema.json    # Task validation schema
-├── standards/          # Governance, compliance, and quality standards
-├── schemas/            # JSON schemas for document validation
-├── tech/               # Technology-specific implementation guides
 └── requirements/       # System requirements and specifications
     └── system.requirements.md
 ```
 
 ## 🎯 Purpose
 
-- **guides/**: Practical guides for implementing DDDK processes
+- **guides/**: Practical guides for implementing DDDK processes and workflows
 - **templates/**: Reusable templates for consistent documentation
-- **standards/**: Governance frameworks and compliance requirements
-- **schemas/**: Validation schemas for document structure
-- **tech/**: Technology-specific implementation guidance
 - **requirements/**: System-level requirements and constraints
 
 ## 📚 Key Documents
 
 - [System Requirements](./requirements/system.requirements.md) - Core system capabilities
-- [Standards Overview](../standards/README.md) - Governance and compliance framework
-- [Technology Guides](../tech/README.md) - Implementation guidance by technology stack
+- [CLI Reference](./cli.md) - Command-line interface documentation
+
+## 🔗 Related Documentation
+
+For reference materials, see:
+
+- [Standards Library](../reference/standards/README.md) - Governance, compliance, and quality standards
+- [Technology Guides](../reference/tech/README.md) - Implementation guidance by technology stack
+- [Validation Schemas](../reference/schemas/) - JSON schemas for document validation
