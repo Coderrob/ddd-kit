@@ -29,9 +29,12 @@ export function validateTasks(tasks: ITask[]): IValidationResult {
   const validator = new AjvValidator(loader);
   const errors: string[] = [];
   for (let i = 0; i < tasks.length; i++) {
-    // Array access with controlled index is safe
-    // eslint-disable-next-line security/detect-object-injection
-    const res = validator.validate(tasks[i]);
+    const task = tasks.at(i);
+    if (!task) {
+      errors.push(`Task[${i}] is undefined`);
+      continue;
+    }
+    const res = validator.validate(task);
     if (!res.isValid) {
       const msg = (res.errors || [])
         .map((e: unknown) => {

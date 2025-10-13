@@ -30,4 +30,12 @@ export class SchemaLoader {
     }
     return parseJsonFile(this.schemaPath, fileManager);
   }
+
+  /**
+   * Gets the path to the schema file.
+   * @returns The schema file path.
+   */
+  getSchemaPath(): string {
+    return this.schemaPath;
+  }
 }

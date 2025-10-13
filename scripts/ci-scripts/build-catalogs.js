@@ -5,9 +5,9 @@ const path = require('path');
 const yaml = require('js-yaml');
 
 const ROOT = path.resolve(__dirname, '..', '..');
-const STANDARDS_DIR = path.join(ROOT, 'standards');
-const TECH_DIR = path.join(ROOT, 'tech');
-const TEMPLATES_DIR = path.join(ROOT, 'templates');
+const STANDARDS_DIR = path.join(ROOT, 'reference', 'standards');
+const TECH_DIR = path.join(ROOT, 'reference', 'tech');
+const TEMPLATES_DIR = path.join(ROOT, 'docs', 'templates');
 const REGISTRY_PATH = path.join(STANDARDS_DIR, 'catalogs', 'registry.json');
 const ALIASES_PATH = path.join(STANDARDS_DIR, 'catalogs', 'aliases.json');
 

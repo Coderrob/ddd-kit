@@ -1,6 +1,6 @@
 {
   "tech:typescript/frameworks/express@5.0": {
-    "path": "tech\\typescript\\frameworks\\express@5\\guide.md",
+    "path": "reference\\tech\\typescript\\frameworks\\express@5\\guide.md",
     "status": "active",
     "sha": "placeholder",
     "aliases": [],

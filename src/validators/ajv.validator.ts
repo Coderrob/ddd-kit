@@ -25,8 +25,14 @@ export class AjvValidator {
    * Compiles the validation schema for use in validation.
    */
   compile(): void {
-    const schema = this.loader.load();
-    this.validateFn = this.ajv.compile(schema as AnySchema);
+    try {
+      const schema = this.loader.load();
+      this.validateFn = this.ajv.compile(schema as AnySchema);
+    } catch (error) {
+      const schemaPath = this.loader.getSchemaPath();
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      throw new Error(`Failed to compile validator for schema '${schemaPath}': ${errorMessage}`);
+    }
   }
 
   /**
