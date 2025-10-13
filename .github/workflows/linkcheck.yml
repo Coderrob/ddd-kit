@@ -1,0 +1,14 @@
+name: Link Check
+on:
+  schedule:
+    - cron: '0 0 * * 0' # Weekly
+jobs:
+  linkcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          use-quiet-mode: 'yes'
+          use-verbose-mode: 'yes'
+          config-file: '.github/linkcheck.json'

@@ -18,7 +18,32 @@ The Document Driven Development Kit (DDDK) is here to revolutionize the way you 
 - **Responsive interface**: Designed to look and feel amazing on any device.
 - **Synchronized experience**: Pick up right where you left off, no matter where you are.
 
-To dive deeper into the magic of DDDK, check out our [non-existent documentation that is still, ironically, being documented].
+To dive deeper into the magic of DDDK, check out our [documentation](./docs/).
+
+---
+
+## Repository Structure 📁
+
+This repository is organized into clear domains to make navigation intuitive:
+
+```text
+ddd-kit/
+├── toolkit/      # CLI tool source code and builds
+├── reference/    # Standards, tech guides, and validation schemas
+│   ├── standards/  # Process standards and best practices
+│   ├── tech/       # Technology-specific implementation guides
+│   └── schemas/    # JSON validation schemas
+├── docs/         # DDDK usage documentation and guides
+├── examples/     # Example projects and workflows
+└── scripts/      # Development and build utilities
+```
+
+### Quick Navigation
+
+- **Want to use the toolkit?** → Start with installation below, see [toolkit/](./toolkit/) for code
+- **Need reference materials?** → Browse [reference/](./reference/) for standards and tech guides
+- **Learning DDDK?** → Check out [docs/](./docs/) for guides and documentation
+- **Want examples?** → See [examples/](./examples/) for sample projects
 
 ---
 
@@ -30,14 +55,15 @@ Clone the repository and install dependencies:
 
 ```bash
 git clone https://github.com/Coderrob/ddd-kit.git
-cd document-driven-development
+cd ddd-kit
 npm install
+npm run build
 ```
 
-Run the toolkit:
+Run the CLI:
 
 ```bash
-npm start
+npm run cli -- --help
 ```
 
 ### Running from Source
@@ -46,10 +72,10 @@ Want to live on the edge? Run the latest codebase:
 
 ```bash
 git clone https://github.com/Coderrob/ddd-kit.git
-cd document-driven-development
+cd ddd-kit
 npm install
 npm run build
-npm start
+npm run cli -- --help
 ```
 
 ⚠️ **Note**: The development version is cutting-edge but may not be production-ready. Use at your own risk!
@@ -60,25 +86,25 @@ npm start
 
 Follow the instructions above to run the toolkit from source. Before contributing, make sure to:
 
-- Read the [Contributing Guide](CONTRIBUTING.md).
 - Run `npm test` to ensure your changes meet our quality standards.
-- Use `npm run dev` for hot module reloading during development.
+- Use `npm run dev` for development with TypeScript compilation.
+- Use `npm run build` to compile TypeScript to JavaScript.
 
-To avoid committing files that fail linting, install a pre-commit git hook:
+To avoid committing files that fail linting, git hooks are automatically installed:
 
 ```bash
-npm run githooks-install
+npm install  # Installs husky pre-commit hooks automatically
 ```
 
 ---
 
 ## Command Line Interface (CLI) ⚡
 
-The Document Driven Development Kit comes with a powerful CLI to supercharge your workflow. Here's what you can do:
+The Document Driven Development Kit comes with a powerful CLI (`dddctl`) to supercharge your workflow. Here's what you can do:
 
-### `cli`
+### CLI Usage
 
-The `cli` command is your gateway to creating and managing specifications.
+The CLI provides task management, validation, and development workflow commands.
 
 #### Usage
 
@@ -86,112 +112,128 @@ The `cli` command is your gateway to creating and managing specifications.
 npm run cli -- <command> [options]
 ```
 
+Or if installed globally:
+
+```bash
+dddctl <command> [options]
+```
+
 #### Commands
 
-- `init`: Kickstart a new specification project.
+- `next`: Hydrate the next eligible task for processing.
 
   Example:
 
   ```bash
-  npm run cli -- init my-project
+  npm run cli -- next
   ```
 
-- `plan`: Turn your specification into a technical implementation plan.
+- `render`: Re-render guidance for a specific task.
 
   Example:
 
   ```bash
-  npm run cli -- plan my-spec.md
+  npm run cli -- render <task-id>
   ```
 
-- `tasks`: Break down your specification into actionable tasks.
+- `supersede`: Supersede an old UID with a new one.
 
   Example:
 
   ```bash
-  npm run cli -- tasks my-spec.md
+  npm run cli -- supersede <old-uid> <new-uid>
   ```
 
 ### CLI Commands and Sub-Commands
 
 The Document Driven Development Kit CLI provides the following commands and sub-commands:
 
-#### `todo:list`
+#### `task list`
 
 List all tasks in the TODO.md file.
 
 Example:
 
 ```bash
-npm run cli -- todo:list
+npm run cli -- task list
 ```
 
-#### `todo:show`
+#### `task show`
 
 Show details of a specific task by ID.
 
 Example:
 
 ```bash
-npm run cli -- todo:show --id <task-id>
+npm run cli -- task show <task-id>
 ```
 
-#### `todo:complete`
+#### `task complete`
 
 Mark a task as complete.
 
 Example:
 
 ```bash
-npm run cli -- todo:complete --id <task-id> --message "Task completed"
+npm run cli -- task complete <task-id>
 ```
 
-#### `todo:add`
+#### `task add`
 
 Add a new task from a file.
 
 Example:
 
 ```bash
-npm run cli -- todo:add --file <file-path>
+npm run cli -- task add <file-path>
 ```
 
-#### `todo:validate`
+#### `validate tasks`
 
-Validate tasks against the schema.
+Validate all tasks against the schema.
 
 Example:
 
 ```bash
-npm run cli -- todo:validate
+npm run cli -- validate tasks
 ```
 
-#### `todo:validate:fix`
+#### `validate fix`
 
 Validate tasks and optionally fix issues.
 
 Example:
 
 ```bash
-npm run cli -- todo:validate:fix --fix --dryRun --summary json
+npm run cli -- validate fix
+```
+
+#### `ref audit`
+
+Audit references across repository and tasks.
+
+Example:
+
+```bash
+npm run cli -- ref audit
 ```
 
 #### Options
 
-- `--debug`: Get detailed debug output for troubleshooting.
+- `-V, --version`: Display the version number.
 
   Example:
 
   ```bash
-  npm run cli -- plan my-spec.md --debug
+  npm run cli -- --version
   ```
 
-- `--no-git`: Skip git repository initialization during `init`.
+- `-h, --help`: Display help information for any command.
 
   Example:
 
   ```bash
-  npm run cli -- init my-project --no-git
+  npm run cli -- task --help
   ```
 
 For a full list of commands and options, run:
@@ -199,6 +241,56 @@ For a full list of commands and options, run:
 ```bash
 npm run cli -- --help
 ```
+
+---
+
+## Development Scripts 🛠️
+
+The project includes several npm scripts for development and validation:
+
+### Task Validation
+
+- **Quick Validation**: Use the lightweight validation script for faster feedback:
+
+  ```bash
+  npm run validate-local
+  ```
+
+  This provides the same validation as `npm run cli -- validate tasks` but with simpler output and faster execution.
+
+### Code Quality
+
+- **Linting**: Check and fix code style issues:
+
+  ```bash
+  npm run lint        # Check for issues
+  npm run lint:fix    # Fix issues automatically
+  ```
+
+- **Formatting**: Format code with Prettier:
+
+  ```bash
+  npm run format      # Format all files
+  npm run format:check # Check formatting
+  ```
+
+- **Build**: Compile TypeScript to JavaScript:
+
+  ```bash
+  npm run build
+  ```
+
+- **Development**: Run CLI directly from TypeScript source:
+
+  ```bash
+  npm run dev        # Equivalent to ts-node src/cli.ts
+  ```
+
+- **Testing**: Run the test suite:
+
+  ```bash
+  npm test
+  ```
 
 ---
 
@@ -212,4 +304,4 @@ npm run cli -- --help
 
 ## License 📜
 
-This project is licensed under the terms of the MIT open source license. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the terms of the GPL v3 open source license. See the [LICENSE](LICENSE) file for details.

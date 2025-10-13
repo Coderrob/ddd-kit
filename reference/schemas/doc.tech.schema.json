@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "uid": {
+      "type": "string",
+      "pattern": "^tech:[a-zA-Z0-9-_/]+@[a-zA-Z0-9.-]+$"
+    },
+    "title": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "status": {
+      "enum": ["draft", "active", "deprecated", "archived"]
+    },
+    "docType": {
+      "const": "tech"
+    },
+    "owners": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "reviewers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "aliases": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "requires": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "supersedes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "lastReviewed": {
+      "type": "string",
+      "format": "date"
+    },
+    "schemaRef": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "uid",
+    "title",
+    "version",
+    "status",
+    "docType",
+    "owners",
+    "reviewers",
+    "lastReviewed",
+    "schemaRef"
+  ]
+}

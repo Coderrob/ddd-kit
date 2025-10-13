@@ -1,11 +1,25 @@
-export type { FixRecord } from './FixRecord';
-export type { ICommand } from './ICommand';
-export type { IExclusionFilter } from './IExclusionFilter';
-export type { IFixerOptions } from './IFixerOptions';
-export type { ILogger } from './ILogger';
-export type { ITaskFixer } from './ITaskFixer';
-export type { ITaskStore } from './ITaskStore';
-export type { ITaskValidator } from './ITaskValidator';
-export type { IValidationResultBuilder } from './IValidationResultBuilder';
-export type { IValidationResult } from './IValidationResult';
-export type { Task } from './Task';
+// Feature-based type exports - grouped by domain responsibility
+
+// Core infrastructure and cross-cutting concerns
+export * from './core';
+
+// Task management domain
+export * from './tasks';
+
+// Command execution framework
+export * from './commands';
+
+// Validation framework
+export * from './validation';
+
+// Content and output rendering
+export * from './rendering';
+
+// Reference auditing and UID management
+export * from './audit';
+
+// Data access and repository patterns
+export * from './repository';
+
+// Logging and observability
+export * from './observability';

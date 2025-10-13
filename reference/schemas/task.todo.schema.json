@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "state": {
+      "enum": ["pending", "in-progress", "completed", "cancelled"]
+    },
+    "language": {
+      "type": "string"
+    },
+    "library": {
+      "type": "string"
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "owner": {
+      "type": "string"
+    },
+    "due": {
+      "type": "string",
+      "format": "date"
+    },
+    "repo": {
+      "type": "string"
+    },
+    "dddKitCommit": {
+      "type": "string"
+    },
+    "resolvedReferences": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "branch": {
+      "type": "string"
+    },
+    "labels": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "priority": {
+      "enum": ["P0", "P1", "P2", "P3"]
+    }
+  },
+  "required": ["id"]
+}

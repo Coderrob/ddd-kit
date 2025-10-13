@@ -1,72 +1,141 @@
-<!--
-TODO.md — Task queue for document-driven development framework
-
-Rules:
--- Tasks are defined using the task-template at `docs/templates/task-template.md`.
-- Each task MUST include the following fields: id, priority, summary, detailed_requirements,
-  positive_behaviors, negative_behaviors, validations, status, owner (optional), created, updated.
-- Tasks in this file are the active queue (resumable and reorderable). When a task is completed,
-  remove it from this file and add a corresponding entry under the `Unreleased` section of `CHANGELOG.md`.
-- Task IDs must be unique and use the prefix `T-` followed by a zero-padded number (e.g. `T-001`).
--->
-
-# TODO — Task Queue
-
-This file is the canonical, human-manageable task queue for the Documentation-Driven Development framework in this repository.
-
-How to use
-
-- To add a task: copy the task template below, fill out the fields, and insert the task at the appropriate priority position.
-- To reorder tasks: move the task block to a new place in this file. Tasks are processed top-to-bottom unless otherwise prioritized.
-- To mark a task complete: remove the task block from this file and add a short summary (task id, summary, and link to PR/commit) to the `Unreleased` section of `CHANGELOG.md`.
-
-Priority convention
-
-- P0 — Critical (blocker for release or security/compliance)
-- P1 — High (important for next release)
-- P2 — Medium (planned for upcoming work)
-- P3 — Low (nice-to-have)
-
-Task template reference
-
-See `docs/templates/task-template.md` for the canonical template and examples. The template below is a quick copy you can paste to create a task.
+# TODO Tasks
 
 ---
 
-id: T-001
-priority: P1
-status: open
-summary: Short one-line summary of the task
-owner: Unassigned
-created: 2025-09-14
-updated: 2025-09-14
-
+id: "T-001"
+title: "Short one-line summary of the task"
+priority: "P1"
+status: "open"
+state: "in-progress"
+owner: "Unassigned"
+created: "2025-09-14T00:00:00.000Z"
+updated: "2025-09-14T00:00:00.000Z"
 detailed_requirements:
 
-- Step 1: Do this.
-
-- Step 2: Do that.
-
-positive_behaviors:
-
-- The system should behave like this when correct.
-
-negative_behaviors:
-
-- The system should NOT do this.
-
-validations:
-
-- Automated tests (unit/integration) to run and expected results.
-
-- Manual checks or QA steps.
-
-notes:
-
-- Any additional context or links to spec ids or planning.md sections.
+- "Step 1: Do this."
+- "Step 2: Do that."
+  positive_behaviors:
+- "The system should behave like this when correct."
+  negative_behaviors:
+- "The system should NOT do this."
+  validations:
+- "Automated tests (unit/integration) to run and expected results."
+- "Manual checks or QA steps."
+  notes:
+- "Any additional context or links to spec ids or planning.md sections."
+  resolvedReferences: []
+  branch: "feature/T-001"
 
 ---
 
-Active tasks
+---
 
-<!-- Add tasks below. Keep the completed tasks out of this file and move to CHANGELOG.md -> Unreleased -->
+id: "t.2025.0924.08"
+title: "Add request validation middleware"
+created: "2025-09-24T08:00:00.000Z"
+updated: "2025-09-24T08:00:00.000Z"
+language: "typescript"
+library: "express@5"
+references:
+
+- "tech:typescript/frameworks/express@5.0"
+  owner: "@platform-fe"
+  due: "2025-10-01"
+  repo: "acme/service-api"
+  state: "in-progress"
+  resolvedReferences: []
+  branch: "feature/t.2025.0924.08"
+
+---
+
+---
+
+id: integration.test.task.001
+title: Implement User Authentication Feature
+state: in-progress
+language: typescript
+owner: integration-test
+due: '2025-10-15'
+repo: ddd-kit
+references:
+
+- auth-service.ts
+- user-model.ts
+  labels:
+- feature
+- authentication
+- security
+  priority: P1
+  resolvedReferences:
+- contentHash: 66186d97b7586ef8788d1bf70756f85751bb787fe64763b97b4557d129a44eb3
+  resolvedAt: '2025-09-30T22:01:12.197Z'
+  uid: auth-service.ts
+- contentHash: 66186d97b7586ef8788d1bf70756f85751bb787fe64763b97b4557d129a44eb3
+  resolvedAt: '2025-09-30T22:01:12.197Z'
+  uid: user-model.ts
+  branch: feature/integration.test.task.001
+
+---
+
+id: "integration.test.task.003"
+title: "API Documentation Generator"
+state: "pending"
+language: "typescript"
+owner: "integration-test"
+due: "2025-10-25"
+repo: "ddd-kit"
+references:
+
+- "doc-generator.ts"
+- "api-parser.ts"
+  labels:
+- "documentation"
+- "api"
+- "automation"
+  priority: "P3"
+
+---
+
+id: "integration.test.task.002"
+title: "Database Migration System"
+state: "pending"
+language: "typescript"
+owner: "integration-test"
+due: "2025-10-20"
+repo: "ddd-kit"
+created: "2025-09-30T21:25:13Z"
+updated: "2025-09-30T21:25:13Z"
+references:
+
+- "migration-runner.ts"
+- "schema-validator.ts"
+  labels:
+- "database"
+- "migration"
+- "infrastructure"
+  priority: "P2"
+
+---
+
+---
+
+id: "integration.test.task.003"
+title: "API Documentation Generator"
+state: "pending"
+language: "typescript"
+owner: "integration-test"
+due: "2025-10-25"
+repo: "ddd-kit"
+created: "2025-09-30T21:25:13Z"
+updated: "2025-09-30T21:25:13Z"
+references:
+
+- "doc-generator.ts"
+- "api-parser.ts"
+  labels:
+- "documentation"
+- "api"
+- "automation"
+  priority: "P3"
+
+---

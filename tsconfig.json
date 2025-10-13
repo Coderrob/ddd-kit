@@ -4,8 +4,8 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
-    "module": "ES2022",
-    "moduleResolution": "bundler",
+    "module": "commonjs",
+    "moduleResolution": "node",
     "outDir": "dist",
     "rootDir": "src",
     "skipLibCheck": true,
@@ -16,17 +16,25 @@
     "sourceMap": true,
     "removeComments": false,
     "noEmitOnError": true,
-    "incremental": true
+    "incremental": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*.ts"],
   "exclude": [
     "node_modules",
     "dist",
-    "**/*.test.ts",
-    "**/*.spec.ts",
     "**/__tests__/**/*",
     "**/__fixtures__/**/*",
     "test/**/*",
-    "scripts/**/*"
+    "scripts/**/*",
+    ".eslintrc.cjs"
   ]
 }
