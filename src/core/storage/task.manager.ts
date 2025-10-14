@@ -8,7 +8,7 @@ import {
   removeYamlBlockById,
 } from '../parsers/yaml.parser';
 import { getLogger } from '../system/logger';
-import { isNullOrUndefined } from '../helpers/type-guards';
+import { isNullOrUndefined } from '../helpers/type.helper';
 
 import { FileManager } from './file-manager';
 
@@ -34,6 +34,7 @@ export class TaskManager implements ITaskStore, IChangelogStore {
 
   /**
    * Lists all tasks from the TODO.md file.
+   * @returns An array of tasks.
    */
   listTasks(): ITask[] {
     const tasks = parseYamlBlocksFromFile(TODO_PATH, this.fileManager, this.logger) as ITask[];
@@ -43,6 +44,8 @@ export class TaskManager implements ITaskStore, IChangelogStore {
 
   /**
    * Finds a task by its ID from the TODO.md file.
+   * @param id The ID of the task to find.
+   * @returns The task if found, otherwise null.
    */
   findTaskById(id: string): ITask | null {
     const tasks = this.listTasks();
@@ -53,6 +56,8 @@ export class TaskManager implements ITaskStore, IChangelogStore {
 
   /**
    * Adds a task from a file to the TODO.md file.
+   * @param filePath The path to the file containing the task in YAML format.
+   * @returns True if the task was added successfully, false otherwise.
    */
   addTaskFromFile(filePath: string): boolean {
     return addYamlBlockFromFile(filePath, TODO_PATH, this.fileManager, this.logger);
@@ -60,6 +65,9 @@ export class TaskManager implements ITaskStore, IChangelogStore {
 
   /**
    * Updates a task by ID in the TODO.md file.
+   * @param id The ID of the task to update.
+   * @param updatedTask The updated task data.
+   * @returns True if the task was updated successfully, false otherwise.
    */
   updateTaskById(id: string, updatedTask: ITask): boolean {
     return updateYamlBlockById({
@@ -73,6 +81,8 @@ export class TaskManager implements ITaskStore, IChangelogStore {
 
   /**
    * Removes a task by ID from the TODO.md file.
+   * @param id The ID of the task to remove.
+   * @returns True if the task was removed successfully, false otherwise.
    */
   removeTaskById(id: string): boolean {
     return removeYamlBlockById(TODO_PATH, this.fileManager, id, this.logger);
@@ -80,33 +90,21 @@ export class TaskManager implements ITaskStore, IChangelogStore {
 
   /**
    * Appends an entry to the CHANGELOG.md file under the "Unreleased" section.
+   * @param entry The changelog entry to add.
    */
   appendToChangelog(entry: string): void {
     if (!this.fileManager.existsSync(CHANGELOG_PATH)) {
-      this.fileManager.writeFileSync(CHANGELOG_PATH, `# Changelog\n\nUnreleased\n\n${entry}\n`);
-      this.logger.info('Created CHANGELOG.md and appended entry', { entry });
+      this.createInitialChangelog(entry);
       return;
     }
 
-    const content = this.fileManager.readFileSync(CHANGELOG_PATH);
-    const idx = content.indexOf('Unreleased');
-    if (idx === -1) {
-      // append at top
-      const newContent = `# Changelog\n\nUnreleased\n\n${entry}\n\n${content}`;
-      this.fileManager.writeFileSync(CHANGELOG_PATH, newContent);
-      return;
-    }
-
-    // find end of line after Unreleased heading
-    const after = content.indexOf('\n', idx);
-    const insertPos = after + 1;
-    const newContent = `${content.slice(0, insertPos)}- ${entry}\n${content.slice(insertPos)}`;
-    this.fileManager.writeFileSync(CHANGELOG_PATH, newContent);
-    this.logger.info('Appended entry to CHANGELOG.md', { entry });
+    this.appendToExistingChangelog(entry);
   }
 
   /**
    * Previews the completion of a task without actually performing the action.
+   * @param id The ID of the task to preview completion for.
+   * @returns A string describing the actions that would be taken.
    */
   previewComplete(id: string): string {
     const task = this.findTaskById(id);
@@ -119,5 +117,61 @@ export class TaskManager implements ITaskStore, IChangelogStore {
       `Will append to CHANGELOG.md Unreleased: ${task.id} — ${task['summary'] ?? 'No summary'}`,
     );
     return lines.join('\n');
+  }
+
+  /**
+   * Creates the initial CHANGELOG.md file with the first entry.
+   * @param entry The changelog entry to add.
+   */
+  private createInitialChangelog(entry: string): void {
+    const content = `# Changelog\n\nUnreleased\n\n${entry}\n`;
+    this.fileManager.writeFileSync(CHANGELOG_PATH, content);
+    this.logger.info('Created CHANGELOG.md and appended entry', { entry });
+  }
+
+  /**
+   * Appends an entry to an existing CHANGELOG.md file.
+   * @param entry The changelog entry to add.
+   */
+  private appendToExistingChangelog(entry: string): void {
+    const content = this.fileManager.readFileSync(CHANGELOG_PATH);
+    const unreleasedIndex = content.indexOf('Unreleased');
+
+    if (unreleasedIndex === -1) {
+      this.appendAtTopOfChangelog(content, entry);
+      return;
+    }
+
+    this.appendUnderUnreleasedSection(content, unreleasedIndex, entry);
+  }
+
+  /**
+   * Appends entry at the top of changelog when no "Unreleased" section exists.
+   * @param content The existing changelog content.
+   * @param entry The changelog entry to add.
+   */
+  private appendAtTopOfChangelog(content: string, entry: string): void {
+    const newContent = `# Changelog\n\nUnreleased\n\n${entry}\n\n${content}`;
+    this.fileManager.writeFileSync(CHANGELOG_PATH, newContent);
+  }
+
+  /**
+   * Appends entry under the existing "Unreleased" section.
+   * @param content The existing changelog content.
+   * @param unreleasedIndex The index of the "Unreleased" section.
+   * @param entry The changelog entry to add.
+   */
+  private appendUnderUnreleasedSection(
+    content: string,
+    unreleasedIndex: number,
+    entry: string,
+  ): void {
+    const afterUnreleasedIndex = content.indexOf('\n', unreleasedIndex);
+    if (afterUnreleasedIndex === -1) return;
+
+    const insertPos = afterUnreleasedIndex + 1;
+    const newContent = `${content.slice(0, insertPos)}- ${entry}\n${content.slice(insertPos)}`;
+    this.fileManager.writeFileSync(CHANGELOG_PATH, newContent);
+    this.logger.info('Appended entry to CHANGELOG.md', { entry });
   }
 }

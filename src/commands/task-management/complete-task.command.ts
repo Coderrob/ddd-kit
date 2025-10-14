@@ -1,4 +1,3 @@
-import chalk from 'chalk';
 import { Command } from 'commander';
 
 import { CompleteTaskArgs, CompleteTaskOptions } from '../../types/tasks';
@@ -6,6 +5,8 @@ import { ILogger } from '../../types/observability';
 import { EXIT_CODES } from '../../constants/exit-codes';
 import { TaskManager } from '../../core/storage/task.manager';
 import { CommandName, ICommand } from '../../types';
+import { IOutputWriter } from '../../types/rendering';
+import { ConsoleOutputWriter } from '../../core/rendering';
 
 /**
  * Command for completing a task by removing it
@@ -15,10 +16,21 @@ export class CompleteTaskCommand implements ICommand {
   readonly name = CommandName.COMPLETE;
   readonly description = 'Mark a task as completed';
 
-  constructor(private readonly logger: ILogger) {}
+  constructor(
+    private readonly logger: ILogger,
+    private readonly outputWriter: IOutputWriter = new ConsoleOutputWriter(),
+  ) {}
 
   /**
    * Removes the task from TODO.md and adds an entry to CHANGELOG.md.
+   * @param args - Arguments containing the task ID to complete
+   * @param options - Options for completion, including message and dry run flag
+   * @returns Promise that resolves when the operation is complete
+   *
+   * @example
+   * ```typescript
+   * await command.execute({ id: 'TASK-123' }, { message: 'Fixed the issue', dryRun: false });
+   * ```
    */
   execute(args: CompleteTaskArgs, options: CompleteTaskOptions = {}): Promise<void> {
     const todoManager = new TaskManager(this.logger);
@@ -37,8 +49,8 @@ export class CompleteTaskCommand implements ICommand {
     // Handle dry run
     if (options.dryRun === true) {
       const preview = todoManager.previewComplete(args.id);
-      console.log(chalk.yellow('Dry run preview:'));
-      console.log(preview);
+      this.outputWriter.warning('Dry run preview:');
+      this.outputWriter.write(preview);
       this.logger.info('Dry run preview generated', { id: args.id });
       return Promise.resolve();
     }
@@ -50,6 +62,9 @@ export class CompleteTaskCommand implements ICommand {
 
   /**
    * Performs the actual task completion by removing from TODO and adding to changelog.
+   * @param id - The ID of the task to complete
+   * @param changelogEntry - The entry to add to the changelog
+   * @param todoManager - The TaskManager instance to use for operations
    */
   private performTaskCompletion(
     id: string,
@@ -70,7 +85,13 @@ export class CompleteTaskCommand implements ICommand {
     });
   }
 
-  static configure(parent: Command, logger: ILogger): void {
+  /**
+   * Configures the complete task command in the CLI program.
+   * @param parent The parent Commander command to attach this command to.
+   * @param logger Logger instance for command logging.
+   * @param outputWriter Optional output writer for command output.
+   */
+  static configure(parent: Command, logger: ILogger, outputWriter?: IOutputWriter): void {
     parent
       .command(CommandName.COMPLETE)
       .argument('<id>', 'Task ID to complete')
@@ -78,7 +99,7 @@ export class CompleteTaskCommand implements ICommand {
       .option('--dry-run', 'Perform dry run without making changes')
       .description('Mark a task as completed')
       .action((id: string, options: CompleteTaskOptions) => {
-        const cmd = new CompleteTaskCommand(logger);
+        const cmd = new CompleteTaskCommand(logger, outputWriter);
         return cmd.execute({ id }, options);
       });
   }

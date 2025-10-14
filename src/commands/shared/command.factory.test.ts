@@ -11,6 +11,7 @@ import { NextCommand } from '../rendering/next.command';
 import { RenderCommand } from '../rendering/render.command';
 import { RefAuditCommand } from '../audit/ref-audit.command';
 import { SupersedeCommand } from '../audit/supersede.command';
+import { IOutputWriter } from '../../types/rendering';
 
 import { CommandFactory } from './command.factory';
 
@@ -48,6 +49,7 @@ jest.mock('../audit/supersede.command');
 
 describe('CommandFactory', () => {
   let mockLogger: ILogger;
+  let mockOutputWriter: IOutputWriter;
   let mockProgram: jest.Mocked<Command>;
   let mockRefCommand: jest.Mocked<Command>;
   let mockTaskCommand: jest.Mocked<Command>;
@@ -55,6 +57,7 @@ describe('CommandFactory', () => {
 
   beforeEach(() => {
     mockLogger = {} as ILogger; // Mock logger, assuming it's just passed through
+    mockOutputWriter = {} as IOutputWriter; // Mock output writer
 
     mockRefCommand = {
       description: jest.fn().mockReturnThis(),
@@ -85,31 +88,91 @@ describe('CommandFactory', () => {
     jest.clearAllMocks();
   });
 
-  it('should configure all commands correctly', () => {
-    CommandFactory.configureProgram(mockProgram, mockLogger);
+  describe('configureProgram', () => {
+    it('should configure all commands correctly', () => {
+      CommandFactory.configureProgram(mockProgram, mockLogger, mockOutputWriter);
 
-    // Verify core commands are configured
-    expect(NextCommand.configure).toHaveBeenCalledWith(mockProgram, mockLogger);
-    expect(RenderCommand.configure).toHaveBeenCalledWith(mockProgram, mockLogger);
-    expect(SupersedeCommand.configure).toHaveBeenCalledWith(mockProgram, mockLogger);
+      // Verify core commands are configured
+      expect(NextCommand.configure).toHaveBeenCalledWith(mockProgram, mockLogger);
+      expect(RenderCommand.configure).toHaveBeenCalledWith(mockProgram, mockLogger);
+      expect(SupersedeCommand.configure).toHaveBeenCalledWith(mockProgram, mockLogger);
 
-    // Verify ref subcommand is created and configured
-    expect(mockProgram.command).toHaveBeenCalledWith('ref');
-    expect(mockRefCommand.description).toHaveBeenCalledWith('Reference management');
-    expect(RefAuditCommand.configure).toHaveBeenCalledWith(mockRefCommand, mockLogger);
+      // Verify ref subcommand is created and configured
+      expect(mockProgram.command).toHaveBeenCalledWith('ref');
+      expect(mockRefCommand.description).toHaveBeenCalledWith('Reference management');
+      expect(RefAuditCommand.configure).toHaveBeenCalledWith(mockRefCommand, mockLogger);
 
-    // Verify task subcommand is created and configured
-    expect(mockProgram.command).toHaveBeenCalledWith('task');
-    expect(mockTaskCommand.description).toHaveBeenCalledWith('Task management commands');
-    expect(AddTaskCommand.configure).toHaveBeenCalledWith(mockTaskCommand, mockLogger);
-    expect(CompleteTaskCommand.configure).toHaveBeenCalledWith(mockTaskCommand, mockLogger);
-    expect(ListTasksCommand.configure).toHaveBeenCalledWith(mockTaskCommand, mockLogger);
-    expect(ShowTaskCommand.configure).toHaveBeenCalledWith(mockTaskCommand, mockLogger);
+      // Verify task subcommand is created and configured
+      expect(mockProgram.command).toHaveBeenCalledWith('task');
+      expect(mockTaskCommand.description).toHaveBeenCalledWith('Task management commands');
+      expect(AddTaskCommand.configure).toHaveBeenCalledWith(
+        mockTaskCommand,
+        mockLogger,
+        mockOutputWriter,
+      );
+      expect(CompleteTaskCommand.configure).toHaveBeenCalledWith(
+        mockTaskCommand,
+        mockLogger,
+        mockOutputWriter,
+      );
+      expect(ListTasksCommand.configure).toHaveBeenCalledWith(
+        mockTaskCommand,
+        mockLogger,
+        mockOutputWriter,
+      );
+      expect(ShowTaskCommand.configure).toHaveBeenCalledWith(
+        mockTaskCommand,
+        mockLogger,
+        mockOutputWriter,
+      );
 
-    // Verify validate subcommand is created and configured
-    expect(mockProgram.command).toHaveBeenCalledWith('validate');
-    expect(mockValidateCommand.description).toHaveBeenCalledWith('Validation commands');
+      // Verify validate subcommand is created and configured
+      expect(mockProgram.command).toHaveBeenCalledWith('validate');
+      expect(mockValidateCommand.description).toHaveBeenCalledWith('Validation commands');
+      expect(ValidateTasksCommand.configure).toHaveBeenCalledWith(mockValidateCommand, mockLogger);
+      expect(ValidateAndFixCommand.configure).toHaveBeenCalledWith(
+        mockValidateCommand,
+        mockLogger,
+        mockOutputWriter,
+      );
+    });
+  });
+
+  it('should handle missing output writer gracefully', () => {
+    expect(() => {
+      CommandFactory.configureProgram(mockProgram, mockLogger, null as any);
+    }).not.toThrow();
+  });
+
+  it('should handle missing logger gracefully', () => {
+    expect(() => {
+      CommandFactory.configureProgram(mockProgram, null as any, mockOutputWriter);
+    }).not.toThrow();
+  });
+
+  it('should configure task commands with output writer', () => {
+    CommandFactory.configureProgram(mockProgram, mockLogger, mockOutputWriter);
+
+    expect(AddTaskCommand.configure).toHaveBeenCalledWith(
+      mockTaskCommand,
+      mockLogger,
+      mockOutputWriter,
+    );
+    expect(CompleteTaskCommand.configure).toHaveBeenCalledWith(
+      mockTaskCommand,
+      mockLogger,
+      mockOutputWriter,
+    );
+  });
+
+  it('should configure validation commands appropriately', () => {
+    CommandFactory.configureProgram(mockProgram, mockLogger, mockOutputWriter);
+
     expect(ValidateTasksCommand.configure).toHaveBeenCalledWith(mockValidateCommand, mockLogger);
-    expect(ValidateAndFixCommand.configure).toHaveBeenCalledWith(mockValidateCommand, mockLogger);
+    expect(ValidateAndFixCommand.configure).toHaveBeenCalledWith(
+      mockValidateCommand,
+      mockLogger,
+      mockOutputWriter,
+    );
   });
 });

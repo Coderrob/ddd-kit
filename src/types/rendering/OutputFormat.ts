@@ -5,4 +5,5 @@
 export enum OutputFormat {
   JSON = 'json',
   CSV = 'csv',
+  TABLE = 'table',
 }

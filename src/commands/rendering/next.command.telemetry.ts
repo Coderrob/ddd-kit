@@ -9,6 +9,12 @@ export interface OperationContext {
 }
 
 export class NextCommandTelemetry {
+  /**
+   * Records the start of the next command execution.
+   * @param obs - The observability logger instance
+   * @param options - The hydration options used
+   * @returns OperationContext containing logger, start time, and timer stop function
+   */
   recordStart(obs: IObservabilityLogger, options: IHydrationOptions): OperationContext {
     const correlationId = obs.createCorrelationId();
     const operationLogger = obs.withCorrelation(correlationId, 'next_command_execution', {
@@ -36,6 +42,11 @@ export class NextCommandTelemetry {
     return { operationLogger, startTime, stopTimer };
   }
 
+  /**
+   * Logs when no eligible tasks are found for hydration.
+   * @param op - The operation context
+   * @param options - The hydration options used
+   */
   noTaskFound(op: OperationContext, options: IHydrationOptions): void {
     op.operationLogger.warn('No eligible tasks found for next command', {
       provider: options.provider ?? TaskProviderType.TASK,
@@ -51,6 +62,12 @@ export class NextCommandTelemetry {
     });
   }
 
+  /**
+   * Records successful command execution with metrics and events.
+   * @param op - The operation context
+   * @param taskId - The ID of the hydrated task
+   * @param provider - The task provider type
+   */
   success(op: OperationContext, taskId: string, provider: string | undefined): void {
     const endTime = new Date();
     const duration = endTime.getTime() - op.startTime.getTime();
@@ -78,6 +95,12 @@ export class NextCommandTelemetry {
     });
   }
 
+  /**
+   * Handles errors during command execution.
+   * @param op - The operation context
+   * @param err - The error that occurred
+   * @param provider - The task provider type
+   */
   error(op: OperationContext, err: unknown, provider: string | undefined): void {
     const endTime = new Date();
     const duration = endTime.getTime() - op.startTime.getTime();

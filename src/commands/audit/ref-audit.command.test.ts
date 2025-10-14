@@ -38,40 +38,48 @@ describe('RefAuditCommand', () => {
     jest.clearAllMocks();
   });
 
-  it('should have correct name and description', () => {
-    const cmd = new RefAuditCommand(mockLogger);
-    expect(cmd.name).toBe(CommandName.AUDIT);
-    expect(cmd.description).toBe('Audit references across repo & tasks');
+  describe('execute', () => {
+    it('should execute the command successfully', async () => {
+      const cmd = new RefAuditCommand(mockLogger);
+      await cmd.execute();
+
+      expect(mockLogger.info).toHaveBeenCalledWith('Executing ref audit command');
+      expect(container.resolve).toHaveBeenCalledWith(SERVICE_KEYS.REFERENCE_AUDIT);
+      expect(mockService.execute).toHaveBeenCalled();
+      expect(mockLogger.info).toHaveBeenCalledWith('Ref audit command executed');
+    });
+
+    it('should handle service execution error', async () => {
+      const error = new Error('Service error');
+      mockService.execute.mockRejectedValue(error);
+
+      const cmd = new RefAuditCommand(mockLogger);
+
+      await expect(cmd.execute()).rejects.toThrow('Service error');
+      expect(mockLogger.info).toHaveBeenCalledWith('Executing ref audit command');
+      expect(mockLogger.info).not.toHaveBeenCalledWith('Ref audit command executed');
+    });
   });
 
-  it('should execute the command successfully', async () => {
-    const cmd = new RefAuditCommand(mockLogger);
-    await cmd.execute();
+  describe('configure', () => {
+    it('should configure the command on parent', () => {
+      RefAuditCommand.configure(mockParentCommand, mockLogger);
 
-    expect(mockLogger.info).toHaveBeenCalledWith('Executing ref audit command');
-    expect(container.resolve).toHaveBeenCalledWith(SERVICE_KEYS.REFERENCE_AUDIT);
-    expect(mockService.execute).toHaveBeenCalled();
-    expect(mockLogger.info).toHaveBeenCalledWith('Ref audit command executed');
+      expect(mockParentCommand.command).toHaveBeenCalledWith(CommandName.AUDIT);
+      expect(mockParentCommand.description).toHaveBeenCalledWith(
+        'Audit references across repo & tasks',
+      );
+      expect(mockParentCommand.action).toHaveBeenCalledWith(expect.any(Function));
+    });
   });
 
-  it('should configure the command on parent', () => {
-    RefAuditCommand.configure(mockParentCommand, mockLogger);
-
-    expect(mockParentCommand.command).toHaveBeenCalledWith(CommandName.AUDIT);
-    expect(mockParentCommand.description).toHaveBeenCalledWith(
-      'Audit references across repo & tasks',
-    );
-    expect(mockParentCommand.action).toHaveBeenCalledWith(expect.any(Function));
-  });
-
-  it('should handle service execution error', async () => {
-    const error = new Error('Service error');
-    mockService.execute.mockRejectedValue(error);
-
-    const cmd = new RefAuditCommand(mockLogger);
-
-    await expect(cmd.execute()).rejects.toThrow('Service error');
-    expect(mockLogger.info).toHaveBeenCalledWith('Executing ref audit command');
-    expect(mockLogger.info).not.toHaveBeenCalledWith('Ref audit command executed');
+  describe('properties', () => {
+    it.each([
+      { property: 'name', expected: CommandName.AUDIT },
+      { property: 'description', expected: 'Audit references across repo & tasks' },
+    ])('should have correct $property', ({ property, expected }) => {
+      const cmd = new RefAuditCommand(mockLogger);
+      expect(cmd[property as keyof RefAuditCommand]).toBe(expected);
+    });
   });
 });

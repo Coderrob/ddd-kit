@@ -5,9 +5,11 @@ import { ILogger } from '../../types/observability';
 import { TaskManager } from '../../core/storage/task.manager';
 import { validateAndFixTasks } from '../../validators/validator';
 import { ValidationResultRenderer } from '../../core/rendering/validation-result.renderer';
-import { isEmptyArray, isNonEmptyString } from '../../core/helpers/type-guards';
+import { isNonEmptyString } from '../../core/helpers/type.helper';
 import { EXIT_CODES } from '../../constants/exit-codes';
 import { BaseCommand } from '../shared/base.command';
+import { IOutputWriter } from '../../types/rendering';
+import { isEmptyArray } from '../../core/helpers/array.helper';
 
 /**
  * Modern command for validating tasks and optionally applying automatic fixes.
@@ -54,6 +56,8 @@ export class ValidateAndFixCommand extends BaseCommand {
 
   /**
    * Performs the validation and fixing operation.
+   * @param options - Command options including fix and dryRun flags
+   * @returns The validation result containing errors and fix information
    */
   private performValidation(options: ValidateFixCommandOptions) {
     const todoManager = new TaskManager(this.logger);
@@ -68,6 +72,10 @@ export class ValidateAndFixCommand extends BaseCommand {
 
   /**
    * Handles the validation result and produces output.
+   * @param options - Command options including output format
+   * @param result - The validation result to handle
+   *
+   * @throws Will set process.exitCode to 5 if validation errors remain after fixing
    */
   private handleValidationResult(
     options: ValidateFixCommandOptions,
@@ -86,6 +94,9 @@ export class ValidateAndFixCommand extends BaseCommand {
 
   /**
    * Handles validation errors by logging them and setting exit code.
+   * @param errors - Array of validation error messages
+   *
+   * @throws Will set process.exitCode to 5 if validation errors remain after fixing
    */
   private handleValidationErrors(errors: string[]): void {
     this.logger.error('Remaining validation errors:');
@@ -94,7 +105,24 @@ export class ValidateAndFixCommand extends BaseCommand {
     process.exitCode = EXIT_CODES.FIX_FAILED;
   }
 
-  static configure(parent: Command, logger: ILogger): void {
+  /**
+   * Configures the validate and fix command for Commander.js.
+   *
+   * Sets up the CLI interface for the validate and fix command, defining the
+   * command name, description, options, and action handler. This static method is
+   * called during application initialization to register the command.
+   *
+   * @param parent - The parent Commander.js command to attach this command to
+   * @param logger - Logger instance for command logging
+   * @param outputWriter - Optional output writer for command output
+   *
+   * @example
+   * ```typescript
+   * const program = new Command();
+   * ValidateAndFixCommand.configure(program, logger, outputWriter);
+   * ```
+   */
+  static configure(parent: Command, logger: ILogger, outputWriter?: IOutputWriter): void {
     parent
       .command('fix')
       .description('Validate and fix tasks')
@@ -103,7 +131,7 @@ export class ValidateAndFixCommand extends BaseCommand {
       .option('--format <format>', 'Output format: json, csv', 'json')
       .option('--exclude <pattern>', 'Pattern to exclude tasks')
       .action(async (options: ValidateFixCommandOptions) => {
-        const renderer = new ValidationResultRenderer(logger);
+        const renderer = new ValidationResultRenderer(logger, outputWriter);
         const cmd = new ValidateAndFixCommand(logger, renderer);
         await cmd.execute(options);
       });

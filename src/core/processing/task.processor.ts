@@ -1,6 +1,6 @@
 import { ITaskFixer, IExclusionFilter, IValidationResultBuilder, ITask } from '../../types';
 import { ValidationContext } from '../../validators/validation.context';
-import { isTask } from '../helpers/type-guards';
+import { isTask } from '../helpers/type.helper';
 import { TaskPersistenceService } from '../services/task-persistence.service';
 import { TaskValidationService } from '../services/task-validation-processor.service';
 

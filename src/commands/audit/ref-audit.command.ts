@@ -15,6 +15,12 @@ export class RefAuditCommand extends BaseCommand {
 
   /**
    * Executes the ref audit command.
+   * @returns Promise that resolves when the operation is complete
+   *
+   * @example
+   * ```typescript
+   * await command.execute();
+   * ```
    */
   async execute(): Promise<void> {
     this.logger.info('Executing ref audit command');
@@ -23,6 +29,11 @@ export class RefAuditCommand extends BaseCommand {
     this.logger.info('Ref audit command executed');
   }
 
+  /**
+   * Configures the command within the parent command.
+   * @param parent - The parent Command instance
+   * @param logger - Logger instance for logging
+   */
   static configure(parent: Command, logger: ILogger): void {
     parent
       .command(CommandName.AUDIT)

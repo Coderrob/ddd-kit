@@ -1,4 +1,3 @@
-import chalk from 'chalk';
 import { Command } from 'commander';
 
 import { ILogger } from '../../types/observability';
@@ -6,7 +5,8 @@ import { TaskManager } from '../../core/storage/task.manager';
 import { EXIT_CODES } from '../../constants/exit-codes';
 import { BaseCommand } from '../shared/base.command';
 import { CommandName } from '../../types';
-import { formatJson } from '../../core/parsers/json.parser';
+import { IOutputWriter } from '../../types/rendering';
+import { ConsoleOutputWriter } from '../../core/rendering/console-output.writer';
 
 interface TaskDetails {
   detailed_requirements?: unknown;
@@ -28,9 +28,18 @@ export class ShowTaskCommand extends BaseCommand {
   readonly name = CommandName.SHOW;
   readonly description = 'Show details of a specific task';
 
+  constructor(
+    logger: ILogger,
+    protected override readonly outputWriter: IOutputWriter = new ConsoleOutputWriter(),
+  ) {
+    super(logger, outputWriter);
+  }
+
   /**
-   * Executes the show task command.
-   * Displays detailed information about a task including its status, owner, requirements, and validations.
+   * Executes the show task command that displays detailed information about
+   * a task including its status, owner, requirements, and validations.
+   * @param args - Command arguments containing the task ID
+   * @returns Promise that resolves when the command execution is complete
    */
   execute(args: TodoShowCommandArgs): Promise<void> {
     const todoManager = new TaskManager(this.logger);
@@ -44,35 +53,45 @@ export class ShowTaskCommand extends BaseCommand {
     }
 
     this.logger.info('Task details displayed', { id: args.id, title: task.title });
-    console.log(chalk.bold(`${task.id} — ${task.title ?? 'Untitled'}`));
-    console.log(`Status: ${task.state ?? 'Unknown'}`);
-    console.log(`Owner: ${task.owner ?? 'Unassigned'}`);
-    console.log('\nDetailed requirements:');
+    this.outputWriter.section(`${task.id} — ${task.title ?? 'Untitled'}`);
+    this.outputWriter.keyValue('Status', task.state ?? 'Unknown');
+    this.outputWriter.keyValue('Owner', task.owner ?? 'Unassigned');
+    this.outputWriter.newline();
+    this.outputWriter.write('Detailed requirements:');
+    this.outputWriter.newline();
 
     try {
-      console.log(formatJson((task as TaskDetails).detailed_requirements ?? {}));
+      this.outputWriter.writeFormatted((task as TaskDetails).detailed_requirements ?? {}, 'json');
     } catch {
-      console.log('(invalid or missing detailed_requirements)');
+      this.outputWriter.warning('(invalid or missing detailed_requirements)');
       this.logger.warn('Invalid detailed_requirements in task', { id: args.id });
     }
 
-    console.log('\nValidations:');
+    this.outputWriter.newline();
+    this.outputWriter.write('Validations:');
+    this.outputWriter.newline();
     try {
-      console.log(formatJson((task as TaskDetails).validations ?? {}));
+      this.outputWriter.writeFormatted((task as TaskDetails).validations ?? {}, 'json');
     } catch {
-      console.log('(invalid or missing validations)');
+      this.outputWriter.warning('(invalid or missing validations)');
       this.logger.warn('Invalid validations in task', { id: args.id });
     }
     return Promise.resolve();
   }
 
-  static configure(parent: Command, logger: ILogger): void {
+  /**
+   * Configures the show task command in the CLI program.
+   * @param parent The parent Commander command to attach this command to.
+   * @param logger Logger instance for command logging.
+   * @param outputWriter Optional output writer for command output.
+   */
+  static configure(parent: Command, logger: ILogger, outputWriter?: IOutputWriter): void {
     parent
       .command(CommandName.SHOW)
       .argument('<id>', 'Task ID to show')
       .description('Show details of a specific task')
       .action(async (id: string) => {
-        const cmd = new ShowTaskCommand(logger);
+        const cmd = new ShowTaskCommand(logger, outputWriter);
         await cmd.execute({ id });
       });
   }

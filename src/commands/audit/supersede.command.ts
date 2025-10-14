@@ -35,6 +35,11 @@ export class SupersedeCommand extends BaseCommand {
     this.logger.info(`Supersede command executed: ${oldUid} -> ${newUid}`, { newUid, oldUid });
   }
 
+  /**
+   * Configures the command within the parent command.
+   * @param parent - The parent Command instance
+   * @param logger - Logger instance for logging
+   */
   static configure(parent: Command, logger: ILogger): void {
     parent
       .command(CommandName.SUPERSEDE)

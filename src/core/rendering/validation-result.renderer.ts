@@ -1,5 +1,3 @@
-import chalk from 'chalk';
-
 import {
   ILogger,
   ValidateFixCommandOptions,
@@ -7,15 +5,19 @@ import {
   OutputFormat,
   IValidationResult,
 } from '../../types';
-import { formatJson } from '../parsers/json.parser';
-import { isEmptyArray } from '../helpers/type-guards';
+import { IOutputWriter } from '../../types/rendering';
+
+import { ConsoleOutputWriter } from './console-output.writer';
 
 /**
  * Handles rendering of validation results in different output formats.
  * Responsible for formatting and displaying validation results, fixes, and completion messages.
  */
 export class ValidationResultRenderer {
-  constructor(private readonly logger: ILogger) {}
+  constructor(
+    private readonly logger: ILogger,
+    private readonly outputWriter: IOutputWriter = new ConsoleOutputWriter(),
+  ) {}
 
   /**
    * Renders validation results based on the specified format.
@@ -24,18 +26,18 @@ export class ValidationResultRenderer {
     // Early return for successful validation with no fixes
     if (result.isValid && (result.fixesApplied ?? 0) === 0) {
       const count = taskCount ?? this.getTaskCount();
-      console.log(chalk.green(`All ${count} tasks validate against schema`));
+      this.outputWriter.success(`All ${count} tasks validate against schema`);
       this.logger.info('All tasks validated successfully', { taskCount: count });
       return;
     }
 
     // Output fixes if any exist
-    if (result.fixes && !isEmptyArray(result.fixes)) {
+    if (result.fixes && result.fixes.length > 0) {
       this.renderFixes(options, result.fixes, result.fixesApplied, options.dryRun);
     }
 
     // Output completion message for successful fixes
-    if (!result.errors || isEmptyArray(result.errors)) {
+    if (!result.errors || result.errors.length === 0) {
       this.renderCompletionMessage(result.fixes, result.fixesApplied, options.dryRun);
     }
   }
@@ -68,7 +70,7 @@ export class ValidationResultRenderer {
    */
   private renderJsonSummary(fixes: FixRecord[], errors: string[]): void {
     const summary = { errors, fixes };
-    console.log(formatJson(summary));
+    this.outputWriter.writeFormatted(summary, 'json');
     this.logger.info('JSON summary generated', {
       errorCount: errors.length,
       fixCount: fixes.length,
@@ -79,10 +81,7 @@ export class ValidationResultRenderer {
    * Renders validation results in CSV format.
    */
   private renderCsvSummary(fixes: FixRecord[]): void {
-    console.log('id,field,old,new');
-    for (const f of fixes) {
-      console.log(`"${f.id}","${f.field}","${String(f.old ?? '')}","${String(f.new)}"`);
-    }
+    this.outputWriter.writeFormatted(fixes, 'csv');
     this.logger.info('CSV summary generated', { fixCount: fixes.length });
   }
 
@@ -95,12 +94,12 @@ export class ValidationResultRenderer {
     isDryRun: boolean | undefined,
   ): void {
     if (isDryRun === true) {
-      console.log(chalk.yellow(`Planned ${fixes.length} fixes (dry-run):`));
-      for (const m of fixes) console.log(`- ${m.id}: ${m.field} -> ${m.new}`);
+      this.outputWriter.warning(`Planned ${fixes.length} fixes (dry-run):`);
+      for (const m of fixes) this.outputWriter.write(`- ${m.id}: ${m.field} -> ${m.new}`);
       this.logger.info('Dry-run fixes displayed', { plannedFixes: fixes.length });
     } else {
-      console.log(chalk.yellow(`Applied ${fixesApplied ?? 0} fixes:`));
-      for (const m of fixes) console.log(`- ${m.id}: ${m.field} -> ${m.new}`);
+      this.outputWriter.warning(`Applied ${fixesApplied ?? 0} fixes:`);
+      for (const m of fixes) this.outputWriter.write(`- ${m.id}: ${m.field} -> ${m.new}`);
       this.logger.info('Applied fixes displayed', { appliedFixes: fixesApplied ?? 0 });
     }
   }
@@ -115,11 +114,11 @@ export class ValidationResultRenderer {
   ): void {
     if (isDryRun === true) {
       const plannedFixes = fixes?.length ?? 0;
-      console.log(chalk.green(`Dry-run complete; ${plannedFixes} fixes would have been applied.`));
+      this.outputWriter.success(`Dry-run complete; ${plannedFixes} fixes would have been applied.`);
       this.logger.info('Dry-run completed', { plannedFixes });
     } else {
       const appliedFixes = fixesApplied ?? 0;
-      console.log(chalk.green(`Validation and fixes completed; ${appliedFixes} changes written.`));
+      this.outputWriter.success(`Validation and fixes completed; ${appliedFixes} changes written.`);
       this.logger.info('Validation and fixes completed', { appliedFixes });
     }
   }

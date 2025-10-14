@@ -4,6 +4,7 @@ import { TaskManager } from '../../core/storage/task.manager';
 import { ILogger } from '../../types/observability';
 import { validateTasks } from '../../validators/validator';
 import { BaseCommand } from '../shared/base.command';
+import { EXIT_CODES } from '../../constants/exit-codes';
 
 /**
  * Modern command for validating all tasks in TODO.md against the task schema.
@@ -56,7 +57,7 @@ export class ValidateTasksCommand extends BaseCommand {
     for (const error of result.errors ?? []) {
       this.logger.error(`- ${error}`);
     }
-    process.exitCode = 4;
+    process.exitCode = EXIT_CODES.VALIDATION_FAILED;
     return Promise.resolve();
   }
 

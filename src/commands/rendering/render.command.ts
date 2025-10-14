@@ -17,6 +17,8 @@ export class RenderCommand extends BaseCommand {
 
   /**
    * Executes the render command.
+   * @param options - Object containing taskId and render options
+   * @returns Promise that resolves when the operation is complete
    */
   async execute(options: IRenderOptions & { taskId: string }): Promise<void> {
     const { taskId, ...rest } = options;
@@ -32,6 +34,11 @@ export class RenderCommand extends BaseCommand {
     }
   }
 
+  /**
+   * Configures the render command in the CLI program.
+   * @param program - The commander program instance
+   * @param logger - The logger instance for command execution
+   */
   static configure(program: Command, logger: ILogger): void {
     program
       .command(CommandName.RENDER)

@@ -2,6 +2,7 @@ import { ITask, TaskState, TaskStatus } from '../../types/tasks';
 import { ITaskRepository } from '../../types/repository';
 import { ILogger } from '../../types/observability';
 import { formatJson } from '../parsers/json.parser';
+import { isNonEmptyString } from '../helpers/type.helper';
 
 import { ProjectV2Item, GraphQLResponse, GitHubProjectIssue, hasContent } from './projects.types';
 
@@ -164,9 +165,7 @@ export class ProjectsProvider implements ITaskRepository {
     return {
       branch: `feature/project-item-${content.number}`,
       created: content.createdAt,
-      ...(typeof content.milestone?.dueOn === 'string' && content.milestone.dueOn !== ''
-        ? { due: content.milestone.dueOn }
-        : {}),
+      ...(isNonEmptyString(content.milestone?.dueOn) ? { due: content.milestone.dueOn } : {}),
       id: item.id,
       issueNumber: content.number,
       owner: (() => {
@@ -192,7 +191,7 @@ export class ProjectsProvider implements ITaskRepository {
 
     if (item.fieldValues?.nodes) {
       for (const fieldValue of item.fieldValues.nodes) {
-        if (typeof fieldValue.field?.name === 'string' && fieldValue.field.name !== '') {
+        if (isNonEmptyString(fieldValue.field?.name)) {
           fieldValues[fieldValue.field.name] = fieldValue.text ?? fieldValue.name ?? '';
         }
       }

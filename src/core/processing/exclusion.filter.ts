@@ -1,6 +1,6 @@
 import { ITask } from '../../types';
 import { IExclusionFilter } from '../../types/repository';
-import { isNullOrUndefined } from '../helpers/type-guards';
+import { isNullOrUndefined } from '../helpers/type.helper';
 
 /**
  * Handles exclusion pattern matching for tasks.

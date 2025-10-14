@@ -44,25 +44,38 @@ describe('RenderCommand', () => {
   });
 
   describe('execute', () => {
-    it('should execute render command successfully', async () => {
-      const command = new RenderCommand(mockLogger);
-      const options: IRenderOptions & { taskId: string } = {
+    it.each([
+      {
         taskId: 'task-123',
-        pin: 'abc123',
-      };
+        options: { pin: 'abc123' },
+        description: 'with pin option',
+      },
+      {
+        taskId: 'task-456',
+        options: {},
+        description: 'without pin option',
+      },
+      {
+        taskId: 'simple-task',
+        options: { pin: 'def789' },
+        description: 'with different pin',
+      },
+    ])('should execute render command successfully $description', async ({ taskId, options }) => {
+      const command = new RenderCommand(mockLogger);
+      const fullOptions = { taskId, ...options };
 
       mockService.execute.mockResolvedValue(undefined);
 
-      await command.execute(options);
+      await command.execute(fullOptions);
 
       expect(mockLogger.info).toHaveBeenCalledWith('Executing render command', {
-        taskId: 'task-123',
-        pin: 'abc123',
+        taskId,
+        ...options,
       });
       expect(container.resolve).toHaveBeenCalledWith(SERVICE_KEYS.TASK_RENDERER);
-      expect(mockService.execute).toHaveBeenCalledWith('task-123', { pin: 'abc123' });
+      expect(mockService.execute).toHaveBeenCalledWith(taskId, options);
       expect(mockLogger.info).toHaveBeenCalledWith('Task rendered successfully', {
-        taskId: 'task-123',
+        taskId,
       });
       expect(mockLogger.error).not.toHaveBeenCalled();
     });

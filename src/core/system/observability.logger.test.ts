@@ -1,6 +1,6 @@
 import pino from 'pino';
 
-import { ObservabilityLogger } from '../../../src/core/system/observability.logger';
+import { ObservabilityLogger } from './observability.logger';
 
 describe('ObservabilityLogger', () => {
   let logger: ObservabilityLogger;
@@ -67,10 +67,11 @@ describe('ObservabilityLogger', () => {
   it('should handle performance spans', () => {
     const startTime = new Date();
     const endTime = new Date(startTime.getTime() + 1000);
-    const correlationId = logger.createCorrelationId();
 
-    expect(() => {
+    const act = () => {
       logger.span('test_operation', startTime, endTime, { success: true });
-    }).not.toThrow();
+    };
+
+    expect(act).not.toThrow();
   });
 });

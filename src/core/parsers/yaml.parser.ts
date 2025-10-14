@@ -5,7 +5,7 @@ import { load, dump, JSON_SCHEMA } from 'js-yaml';
 import { ILogger } from '../../types/observability';
 import { IFileManager } from '../../types/core';
 import { getLogger } from '../system/logger';
-import { isNonEmptyString, isObject } from '../helpers/type-guards';
+import { isNonEmptyString, isObject } from '../helpers/type.helper';
 
 /**
  * Extracts YAML blocks from markdown content.

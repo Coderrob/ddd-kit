@@ -22,19 +22,32 @@ export class TaskFixer {
 
   /**
    * Applies basic automatic fixes to common validation issues in a task object.
-   * @param asObj - The task object to fix (as a record).
-   * @returns An array of FixRecord objects describing the fixes applied.
+   * @param asObj - The original task object (not modified).
+   * @returns An object containing the fixed task and an array of FixRecord objects describing the fixes applied.
    */
-  applyBasicFixes(asObj: ITask): FixRecord[] {
+  applyBasicFixes(asObj: ITask): { fixedTask: ITask; fixes: FixRecord[] } {
     const fixes: FixRecord[] = [];
     const id = String(asObj.id);
 
-    fixPriority(asObj, fixes, id);
-    fixStatus(asObj, fixes, id);
-    fixDateField({ nowIso: this.nowIso, asObj, field: 'created', fixes, id });
-    fixDateField({ nowIso: this.nowIso, asObj, field: 'updated', fixes, id });
-    fixOwner(asObj, fixes, id);
+    // Chain the immutable fixes
+    let fixedTask = fixPriority(asObj, fixes, id);
+    fixedTask = fixStatus(fixedTask, fixes, id);
+    fixedTask = fixDateField({
+      nowIso: this.nowIso,
+      asObj: fixedTask,
+      field: 'created',
+      fixes,
+      id,
+    });
+    fixedTask = fixDateField({
+      nowIso: this.nowIso,
+      asObj: fixedTask,
+      field: 'updated',
+      fixes,
+      id,
+    });
+    fixedTask = fixOwner(fixedTask, fixes, id);
 
-    return fixes;
+    return { fixedTask, fixes };
   }
 }

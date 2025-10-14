@@ -38,10 +38,23 @@ describe('SupersedeCommand', () => {
   });
 
   describe('execute', () => {
-    it('should execute supersede and log correctly', async () => {
-      const oldUid = 'OLD123';
-      const newUid = 'NEW456';
-
+    it.each([
+      {
+        oldUid: 'OLD123',
+        newUid: 'NEW456',
+        description: 'valid UIDs',
+      },
+      {
+        oldUid: 'ABC',
+        newUid: 'XYZ',
+        description: 'short UIDs',
+      },
+      {
+        oldUid: 'old-uid-123',
+        newUid: 'new-uid-456',
+        description: 'dashed UIDs',
+      },
+    ])('should execute supersede successfully with $description', async ({ oldUid, newUid }) => {
       await command.execute({ oldUid, newUid });
 
       expect(mockLogger.info).toHaveBeenCalledWith('Executing supersede command', {
@@ -69,7 +82,6 @@ describe('SupersedeCommand', () => {
         oldUid: 'OLD123',
       });
       expect(mockService.execute).toHaveBeenCalledWith('OLD123', 'NEW456');
-      // Note: In real scenario, error logging might be handled by BaseCommand or elsewhere
     });
   });
 

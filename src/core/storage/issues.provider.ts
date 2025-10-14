@@ -2,6 +2,7 @@ import { ITask, TaskState, TaskStatus } from '../../types/tasks';
 import { ITaskRepository } from '../../types/repository';
 import { ILogger } from '../../types/observability';
 import { formatJson } from '../parsers/json.parser';
+import { isNonEmptyString, isNullOrUndefined, isString } from '../helpers/type.helper';
 
 import { GitHubLabel, isGitHubIssue } from './github.types';
 
@@ -188,7 +189,7 @@ export class IssuesProvider implements ITaskRepository {
       ...(options.headers as Record<string, string>),
     };
 
-    if (typeof options.body === 'string') {
+    if (isString(options.body)) {
       headers['Content-Type'] = 'application/json';
     }
 
@@ -213,7 +214,7 @@ export class IssuesProvider implements ITaskRepository {
       repo: this.githubRepo,
       resolvedReferences: [],
       state: this.mapIssueStateToTaskState(issue.state),
-      status: issue.state === 'closed' ? TaskStatus.Closed : TaskStatus.Open,
+      status: issue.state === TaskStatus.Closed ? TaskStatus.Closed : TaskStatus.Open,
       title: issue.title,
       updated: issue.updated_at,
     };
@@ -230,22 +231,22 @@ export class IssuesProvider implements ITaskRepository {
   }
 
   private mapIssueStateToTaskState(issueState: string): TaskState {
-    return issueState === 'closed' ? TaskState.Completed : TaskState.Pending;
+    return issueState === TaskState.Completed ? TaskState.Completed : TaskState.Pending;
   }
 
-  private mapTaskStateToIssueState(taskState?: TaskState): 'open' | 'closed' {
+  private mapTaskStateToIssueState(taskState?: TaskState): TaskStatus.Open | TaskStatus.Closed {
     return taskState === TaskState.Completed || taskState === TaskState.Cancelled
-      ? 'closed'
-      : 'open';
+      ? TaskStatus.Closed
+      : TaskStatus.Open;
   }
 
   private formatTaskBody(task: ITask): string {
     const parts: string[] = [`# ${task.title ?? task.id}\n`];
-    if (typeof task.owner === 'string' && task.owner !== '' && task.owner !== 'Unassigned') {
+    if (isNonEmptyString(task.owner) && task.owner !== 'Unassigned') {
       parts.push(`**Assignee:** @${task.owner}`);
     }
-    if (typeof task.due === 'string' && task.due !== '') parts.push(`**Due Date:** ${task.due}`);
-    if (task.state != null) parts.push(`**State:** ${task.state}`);
+    if (isNonEmptyString(task.due)) parts.push(`**Due Date:** ${task.due}`);
+    if (!isNullOrUndefined(task.state)) parts.push(`**State:** ${task.state}`);
     if (Array.isArray(task.references) && task.references.length > 0) {
       parts.push(`\n**References:**\n${task.references.map((ref) => `- ${ref}`).join('\n')}`);
     }
@@ -254,7 +255,7 @@ export class IssuesProvider implements ITaskRepository {
 
   private extractLabels(task: ITask): string[] {
     const labels: string[] = [];
-    if (typeof task.language === 'string' && task.language !== '') {
+    if (isNonEmptyString(task.language)) {
       labels.push(`lang:${task.language}`);
     }
     if (task.state != null) labels.push(`state:${task.state}`);

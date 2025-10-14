@@ -1,4 +1,3 @@
-import chalk from 'chalk';
 import { Command } from 'commander';
 
 import { ILogger } from '../../types/observability';
@@ -7,6 +6,8 @@ import { AddTaskArgs } from '../../types/tasks';
 import { EXIT_CODES } from '../../constants/exit-codes';
 import { BaseCommand } from '../shared/base.command';
 import { CommandName } from '../../types';
+import { IOutputWriter } from '../../types/rendering';
+import { ConsoleOutputWriter } from '../../core/rendering';
 
 /**
  * Command for adding a new task from a file to the TODO.md.
@@ -25,6 +26,13 @@ import { CommandName } from '../../types';
 export class AddTaskCommand extends BaseCommand {
   readonly name = CommandName.ADD;
   readonly description = 'Add a new task from a file';
+
+  constructor(
+    logger: ILogger,
+    protected override readonly outputWriter: IOutputWriter = new ConsoleOutputWriter(),
+  ) {
+    super(logger, outputWriter);
+  }
 
   /**
    * Executes the add task command.
@@ -45,19 +53,47 @@ export class AddTaskCommand extends BaseCommand {
     try {
       const manager = new TaskManager(this.logger);
       const added = manager.addTaskFromFile(args.file);
+
       if (added) {
-        console.log(chalk.green(`Task added to TODO.md from ${args.file}`));
-        this.logger.info('Task added successfully', { file: args.file });
-      } else {
-        this.logger.error(`Failed to add task from ${args.file}`, { file: args.file });
-        process.exitCode = EXIT_CODES.GENERAL_ERROR;
+        this.handleSuccessfulAddition(args.file);
+        return Promise.resolve();
       }
+
+      this.handleFailedAddition(args.file);
+      return Promise.resolve();
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      this.logger.error(`Error adding task: ${message}`, { error: message, file: args.file });
-      process.exitCode = EXIT_CODES.NOT_FOUND;
+      this.handleAdditionError(error, args.file);
+      return Promise.resolve();
     }
-    return Promise.resolve();
+  }
+
+  /**
+   * Handles successful task addition.
+   * @param filePath - The path of the file being processed
+   */
+  private handleSuccessfulAddition(filePath: string): void {
+    this.outputWriter.success(`Task added to TODO.md from ${filePath}`);
+    this.logger.info('Task added successfully', { file: filePath });
+  }
+
+  /**
+   * Handles failed task addition.
+   * @param filePath - The path of the file being processed
+   */
+  private handleFailedAddition(filePath: string): void {
+    this.logger.error(`Failed to add task from ${filePath}`, { file: filePath });
+    process.exitCode = EXIT_CODES.GENERAL_ERROR;
+  }
+
+  /**
+   * Handles errors during task addition.
+   * @param error - The error that occurred
+   * @param filePath - The path of the file being processed
+   */
+  private handleAdditionError(error: unknown, filePath: string): void {
+    const message = error instanceof Error ? error.message : String(error);
+    this.logger.error(`Error adding task: ${message}`, { error: message, file: filePath });
+    process.exitCode = EXIT_CODES.NOT_FOUND;
   }
 
   /**
@@ -75,13 +111,13 @@ export class AddTaskCommand extends BaseCommand {
    * AddTaskCommand.configure(program);
    * ```
    */
-  static configure(parent: Command, logger: ILogger): void {
+  static configure(parent: Command, logger: ILogger, outputWriter?: IOutputWriter): void {
     parent
       .command(CommandName.ADD)
       .argument('<file>', 'File containing the task to add')
       .description('Add a new task from a file')
       .action(async (file: string) => {
-        const cmd = new AddTaskCommand(logger);
+        const cmd = new AddTaskCommand(logger, outputWriter);
         await cmd.execute({ file });
       });
   }

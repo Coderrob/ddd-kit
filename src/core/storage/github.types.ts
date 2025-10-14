@@ -1,4 +1,4 @@
-import { isObject } from '../helpers/type-guards';
+import { isObject } from '../helpers/type.helper';
 
 /**
  * GitHub API types for type safety

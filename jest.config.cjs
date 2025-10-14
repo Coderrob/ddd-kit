@@ -35,4 +35,8 @@ module.exports = {
   clearMocks: true,
   restoreMocks: true,
   resetMocks: true,
+  transformIgnorePatterns: ['node_modules/(?!chalk)'],
+  moduleNameMapper: {
+    '^chalk$': '<rootDir>/__mocks__/chalk.js',
+  },
 };

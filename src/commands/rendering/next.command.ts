@@ -6,7 +6,7 @@ import { NextCommandOptions } from '../../types/rendering';
 import { ITaskRepository } from '../../types/repository';
 import { IHydrationOptions, ITask, TaskState } from '../../types/tasks';
 import { TaskProviderFactory } from '../../core/storage/task-provider.factory';
-import { isNullOrUndefined } from '../../core/helpers/type-guards';
+import { isNullOrUndefined } from '../../core/helpers/type.helper';
 import { TaskHydrationService } from '../../core/processing/hydrate';
 import { Resolver } from '../../core/helpers/uid-resolver';
 import { Renderer } from '../../core/rendering/renderer';
@@ -45,6 +45,13 @@ export class NextCommand extends BaseCommand {
 
   /**
    * Executes the next command with comprehensive observability.
+   * @param options - The hydration options
+   * @returns Promise that resolves when the operation is complete
+   *
+   * @example
+   * ```typescript
+   * await command.execute({ provider: 'issues', filters: ['priority:high'], branchPrefix: 'feature/' });
+   * ```
    */
   async execute(options: IHydrationOptions): Promise<void> {
     const op: OperationContext = this.telemetry.recordStart(this.observabilityLogger, options);
@@ -72,6 +79,8 @@ export class NextCommand extends BaseCommand {
 
   /**
    * Creates a task provider based on the provider type.
+   * @param providerType - The type of provider to create
+   * @returns the created provider instance
    */
   private createProvider(providerType: string): ITaskRepository {
     let taskProviderType: TaskProviderType;
@@ -88,6 +97,9 @@ export class NextCommand extends BaseCommand {
 
   /**
    * Finds the next eligible task.
+   * @param provider - The task repository provider
+   * @param options - The hydration options containing filters
+   * @returns The next eligible task or null if none found
    */
   private async findNextTask(
     provider: ITaskRepository,
@@ -102,6 +114,10 @@ export class NextCommand extends BaseCommand {
 
   /**
    * Hydrates and updates the task.
+   * @param task - The task to hydrate and update
+   * @param options - The hydration options
+   * @param provider - The task repository provider
+   * @returns Promise that resolves when the task is hydrated and updated
    */
   private async hydrateAndUpdateTask(
     task: ITask,
@@ -130,6 +146,11 @@ export class NextCommand extends BaseCommand {
     await provider.update(updatedTask);
   }
 
+  /**
+   * Configures the next command in the CLI program.
+   * @param program - The commander program instance
+   * @param logger - The logger instance for command execution
+   */
   static configure(program: Command, logger: ILogger): void {
     program
       .command(CommandName.NEXT)

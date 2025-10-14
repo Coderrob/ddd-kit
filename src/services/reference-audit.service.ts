@@ -1,11 +1,19 @@
 import type { IReferenceAuditUseCase, IReferenceAuditResult } from '../types/audit';
 import type { IResolver } from '../types/repository';
-import { isNullOrUndefined } from '../core/helpers/type-guards';
+import { isNullOrUndefined } from '../core/helpers/type.helper';
 import { UidStatus } from '../types/audit';
 
 export class ReferenceAuditService implements IReferenceAuditUseCase {
+  /**
+   * Creates a new ReferenceAuditService instance.
+   * @param resolver - The resolver instance for accessing the UID registry
+   */
   constructor(private readonly resolver: IResolver) {}
 
+  /**
+   * Executes the reference audit operation to analyze UID status and references.
+   * @returns Promise that resolves to the audit result containing statistics and categorized UIDs
+   */
   execute(): Promise<IReferenceAuditResult> {
     const registry = this.resolver.getRegistry();
     let totalReferences = 0;
