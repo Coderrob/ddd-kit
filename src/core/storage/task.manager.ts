@@ -167,7 +167,10 @@ export class TaskManager implements ITaskStore, IChangelogStore {
     entry: string,
   ): void {
     const afterUnreleasedIndex = content.indexOf('\n', unreleasedIndex);
-    if (afterUnreleasedIndex === -1) return;
+    if (afterUnreleasedIndex === -1) {
+      this.logger.warn('Could not append entry to CHANGELOG.md: no newline found after "Unreleased" section.', { entry });
+      return;
+    }
 
     const insertPos = afterUnreleasedIndex + 1;
     const newContent = `${content.slice(0, insertPos)}- ${entry}\n${content.slice(insertPos)}`;
