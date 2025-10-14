@@ -1,11 +1,14 @@
 import { Command } from 'commander';
 
 import { container } from '../../core/system/container';
-import { SERVICE_KEYS } from '../../types/core';
-import { RenderCommandOptions } from '../../types/rendering';
-import { ILogger } from '../../types/observability';
-import { IRenderOptions } from '../../types/tasks';
-import { CommandName, ITaskRenderUseCase } from '../../types';
+import {
+  CommandName,
+  IRenderOptions,
+  ITaskRenderUseCase,
+  SERVICE_KEYS,
+  ILogger,
+  RenderCommandOptions,
+} from '../../types';
 import { BaseCommand } from '../shared/base.command';
 
 /**

@@ -3,7 +3,7 @@ import { Command } from 'commander';
 import { ILogger } from '../../types/observability';
 import { TaskManager } from '../../core/storage/task.manager';
 import { AddTaskArgs } from '../../types/tasks';
-import { EXIT_CODES } from '../../constants/exit-codes';
+import { EXIT_CODES } from '../../types/core';
 import { IOutputWriter } from '../../types/rendering';
 import { CommandName } from '../../types';
 

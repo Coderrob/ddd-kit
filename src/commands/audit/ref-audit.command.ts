@@ -1,9 +1,7 @@
 import { Command } from 'commander';
 
 import { container } from '../../core/system/container';
-import { SERVICE_KEYS } from '../../types/core';
-import { ILogger } from '../../types/observability';
-import { CommandName, IReferenceAuditUseCase } from '../../types';
+import { CommandName, IReferenceAuditUseCase, SERVICE_KEYS, ILogger } from '../../types';
 import { BaseCommand } from '../shared/base.command';
 
 /**

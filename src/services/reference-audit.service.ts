@@ -1,7 +1,5 @@
-import type { IReferenceAuditUseCase, IReferenceAuditResult } from '../types/audit';
-import type { IResolver } from '../types/repository';
 import { isNullOrUndefined } from '../core/helpers/type.helper';
-import { UidStatus } from '../types/audit';
+import { IReferenceAuditUseCase, IResolver, IReferenceAuditResult, UidStatus } from '../types';
 
 export class ReferenceAuditService implements IReferenceAuditUseCase {
   /**

@@ -1,5 +1,4 @@
-import { ILogger } from '../../types';
-import { IOutputWriter } from '../../types/rendering';
+import { ILogger, IOutputWriter } from '../../types';
 
 import { BaseCommand } from './base.command';
 

@@ -1,6 +1,4 @@
-import { ITask, TaskState } from '../../types/tasks';
-import { ITaskRepository } from '../../types/repository';
-import { ILogger } from '../../types/observability';
+import { ITaskRepository, ILogger, ITask, TaskState } from '../../types';
 import { isNullOrUndefined, isObject, isString } from '../helpers/type.helper';
 
 import { TaskManager } from './task.manager';

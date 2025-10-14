@@ -1,13 +1,9 @@
 import { Command } from 'commander';
 
-import { ILogger } from '../../types/observability';
-import { TaskManager } from '../../core/storage/task.manager';
-import { AddTaskArgs } from '../../types/tasks';
-import { EXIT_CODES } from '../../constants/exit-codes';
-import { BaseCommand } from '../shared/base.command';
-import { CommandName } from '../../types';
-import { IOutputWriter } from '../../types/rendering';
 import { ConsoleOutputWriter } from '../../core/rendering';
+import { TaskManager } from '../../core/storage';
+import { CommandName, ILogger, IOutputWriter, AddTaskArgs, EXIT_CODES } from '../../types';
+import { BaseCommand } from '../shared/base.command';
 
 /**
  * Command for adding a new task from a file to the TODO.md.

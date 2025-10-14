@@ -5,7 +5,7 @@ import pino from 'pino';
 import { getLogger } from './core/system/logger';
 import { ObservabilityLogger } from './core/system/observability.logger';
 import { CommandFactory } from './commands/shared/command.factory';
-import { EXIT_CODES } from './constants/exit-codes';
+import { EXIT_CODES } from './types/core';
 import { ConsoleOutputWriter } from './core/rendering/console-output.writer';
 
 /**

@@ -1,5 +1,4 @@
-import { ILogger } from '../../types/observability';
-import { IFileManager } from '../../types/core';
+import { IFileManager, ILogger } from '../../types';
 import { getLogger } from '../system/logger';
 
 /**

@@ -82,7 +82,11 @@ export class TaskProcessor {
    * ```
    */
   private async applyFixes(taskObj: ITask, taskId: string, index: number): Promise<void> {
-    const localFixes = this.options.fixer.applyBasicFixes(taskObj);
+    const result = this.options.fixer.applyBasicFixes(taskObj);
+    const { fixedTask, fixes: localFixes } = result;
+
+    // Update the task object with the fixed version
+    Object.assign(taskObj, fixedTask);
 
     if (localFixes.length > 0) {
       this.options.resultBuilder.addFixes(localFixes);

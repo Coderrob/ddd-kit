@@ -70,7 +70,7 @@ export class ValidationResultRenderer {
    */
   private renderJsonSummary(fixes: FixRecord[], errors: string[]): void {
     const summary = { errors, fixes };
-    this.outputWriter.writeFormatted(summary, 'json');
+    this.outputWriter.writeFormatted(summary, OutputFormat.JSON);
     this.logger.info('JSON summary generated', {
       errorCount: errors.length,
       fixCount: fixes.length,
@@ -81,7 +81,7 @@ export class ValidationResultRenderer {
    * Renders validation results in CSV format.
    */
   private renderCsvSummary(fixes: FixRecord[]): void {
-    this.outputWriter.writeFormatted(fixes, 'csv');
+    this.outputWriter.writeFormatted(fixes, OutputFormat.CSV);
     this.logger.info('CSV summary generated', { fixCount: fixes.length });
   }
 

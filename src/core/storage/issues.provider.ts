@@ -1,10 +1,14 @@
-import { ITask, TaskState, TaskStatus } from '../../types/tasks';
-import { ITaskRepository } from '../../types/repository';
-import { ILogger } from '../../types/observability';
-import { formatJson } from '../parsers/json.parser';
+import {
+  ITaskRepository,
+  ILogger,
+  ITask,
+  isGitHubIssue,
+  GitHubLabel,
+  TaskStatus,
+  TaskState,
+} from '../../types';
 import { isNonEmptyString, isNullOrUndefined, isString } from '../helpers/type.helper';
-
-import { GitHubLabel, isGitHubIssue } from './github.types';
+import { formatJson } from '../parsers/json.parser';
 
 /**
  * GitHub Issues provider for task management.

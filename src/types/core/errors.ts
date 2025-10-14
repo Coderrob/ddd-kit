@@ -1,3 +1,5 @@
+import { isNullOrUndefined } from '../../core/helpers/type.helper';
+
 /**
  * Domain-specific error types for the DDD-Kit system.
  * Following clean architecture principles with domain-specific exceptions.
@@ -45,5 +47,39 @@ export abstract class DomainError extends Error {
       error_type: this.name,
       timestamp: this.timestamp,
     };
+  }
+}
+
+export class ValidationError extends DomainError {
+  readonly code = 'VALIDATION_ERROR';
+
+  constructor(
+    message: string,
+    public readonly field?: string,
+  ) {
+    super(message);
+    Object.setPrototypeOf(this, ValidationError.prototype);
+  }
+}
+
+export class UidStatusError extends DomainError {
+  readonly code = 'UID_STATUS_ERROR';
+
+  constructor(uid: string, status: string) {
+    super(`UID '${uid}' has invalid status: ${status}`);
+    Object.setPrototypeOf(this, UidStatusError.prototype);
+  }
+}
+
+export class UidResolutionError extends DomainError {
+  readonly code = 'UID_RESOLUTION_ERROR';
+
+  constructor(uid: string, reason?: string) {
+    let message = `Failed to resolve UID '${uid}'`;
+    if (!isNullOrUndefined(reason) && reason.trim().length > 0) {
+      message += `: ${reason}`;
+    }
+    super(message);
+    Object.setPrototypeOf(this, UidResolutionError.prototype);
   }
 }

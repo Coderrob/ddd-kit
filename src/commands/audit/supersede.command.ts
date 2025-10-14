@@ -1,15 +1,14 @@
 import { Command } from 'commander';
 
 import { container } from '../../core/system/container';
-import { SERVICE_KEYS } from '../../types/core';
-import { ILogger } from '../../types/observability';
-import { CommandName, IUIdSupersedeUseCase } from '../../types';
+import {
+  CommandName,
+  ISupersedeOptions,
+  IUIdSupersedeUseCase,
+  SERVICE_KEYS,
+  ILogger,
+} from '../../types';
 import { BaseCommand } from '../shared/base.command';
-
-interface ISupersedeOptions {
-  oldUid: string;
-  newUid: string;
-}
 
 /**
  * Command for superseding UIDs.

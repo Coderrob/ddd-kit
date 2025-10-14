@@ -1,10 +1,8 @@
 import { Command } from 'commander';
 
-import { ILogger } from '../../types/observability';
-import { TaskManager } from '../../core/storage/task.manager';
+import { TaskManager } from '../../core/storage';
+import { CommandName, ILogger, IOutputWriter } from '../../types';
 import { BaseCommand } from '../shared/base.command';
-import { CommandName } from '../../types';
-import { IOutputWriter } from '../../types/rendering';
 
 /**
  * Modern command for listing all tasks from the TODO.md file.

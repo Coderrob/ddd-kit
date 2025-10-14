@@ -1,12 +1,12 @@
-import { CommandName } from '../../types';
-import { IObservabilityLogger } from '../../types/observability';
-import { IHydrationOptions, TaskProviderType } from '../../types/tasks';
+import {
+  OperationContext,
+  IObservabilityLogger,
+  IHydrationOptions,
+  CommandName,
+  TaskProviderType,
+} from '../../types';
 
-export interface OperationContext {
-  operationLogger: IObservabilityLogger;
-  startTime: Date;
-  stopTimer: () => void;
-}
+export type { OperationContext };
 
 export class NextCommandTelemetry {
   /**

@@ -1,11 +1,11 @@
 import * as path from 'path';
+import { isObject } from 'util';
 
 import { load, dump, JSON_SCHEMA } from 'js-yaml';
 
-import { ILogger } from '../../types/observability';
-import { IFileManager } from '../../types/core';
+import { ILogger, IFileManager, UpdateYamlBlockOptions } from '../../types';
+import { isNonEmptyString } from '../helpers/type.helper';
 import { getLogger } from '../system/logger';
-import { isNonEmptyString, isObject } from '../helpers/type.helper';
 
 /**
  * Extracts YAML blocks from markdown content.
@@ -128,17 +128,6 @@ export function parseYamlBlocksFromFile(
   }
   log.debug('Parsed YAML blocks from file', { count: out.length, filePath });
   return out;
-}
-
-/**
- * Options for updating a YAML block by ID.
- */
-interface UpdateYamlBlockOptions {
-  filePath: string;
-  id: string;
-  updatedData: Record<string, unknown>;
-  fileSystem: IFileManager;
-  logger?: ILogger;
 }
 
 /**

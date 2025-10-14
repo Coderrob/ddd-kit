@@ -1,6 +1,5 @@
-import { ICommand, ILogger } from '../../types';
-import { IOutputWriter } from '../../types/rendering';
 import { ConsoleOutputWriter } from '../../core/rendering';
+import { ICommand, ILogger, IOutputWriter } from '../../types';
 
 export abstract class BaseCommand implements ICommand {
   abstract name: string;

@@ -1,10 +1,16 @@
-import { ITask, TaskState, TaskStatus } from '../../types/tasks';
-import { ITaskRepository } from '../../types/repository';
-import { ILogger } from '../../types/observability';
-import { formatJson } from '../parsers/json.parser';
+import {
+  ITaskRepository,
+  ILogger,
+  ITask,
+  hasContent,
+  GraphQLResponse,
+  ProjectV2Item,
+  TaskStatus,
+  TaskState,
+  GitHubProjectIssue,
+} from '../../types';
 import { isNonEmptyString } from '../helpers/type.helper';
-
-import { ProjectV2Item, GraphQLResponse, GitHubProjectIssue, hasContent } from './projects.types';
+import { formatJson } from '../parsers/json.parser';
 
 /**
  * GitHub Projects provider for task management.

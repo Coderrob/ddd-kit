@@ -1,15 +1,18 @@
 import { Command } from 'commander';
 
-import { IValidationResult, ValidateFixCommandOptions } from '../../types/validation';
-import { ILogger } from '../../types/observability';
-import { TaskManager } from '../../core/storage/task.manager';
-import { validateAndFixTasks } from '../../validators/validator';
-import { ValidationResultRenderer } from '../../core/rendering/validation-result.renderer';
-import { isNonEmptyString } from '../../core/helpers/type.helper';
-import { EXIT_CODES } from '../../constants/exit-codes';
-import { BaseCommand } from '../shared/base.command';
-import { IOutputWriter } from '../../types/rendering';
 import { isEmptyArray } from '../../core/helpers/array.helper';
+import { isNonEmptyString } from '../../core/helpers/type.helper';
+import { ValidationResultRenderer } from '../../core/rendering/validation-result.renderer';
+import { TaskManager } from '../../core/storage';
+import {
+  ILogger,
+  ValidateFixCommandOptions,
+  IValidationResult,
+  EXIT_CODES,
+  IOutputWriter,
+} from '../../types';
+import { validateAndFixTasks } from '../../validators/validator';
+import { BaseCommand } from '../shared/base.command';
 
 /**
  * Modern command for validating tasks and optionally applying automatic fixes.

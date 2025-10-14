@@ -1,24 +1,11 @@
 import * as path from 'path';
 
-import type { IResolver } from '../../types/repository';
-import { FileManager } from '../storage/file-manager';
+import { IResolver, IRegistryEntry, RegistryEntryDetails } from '../../types';
 import { parseJsonFile } from '../parsers/json.parser';
+import { FileManager } from '../storage';
 
-import { isString } from './type.helper';
 import { safeGet } from './object.helper';
-
-interface IRegistryEntry {
-  path: string;
-  status: string;
-  sha: string;
-  aliases: string[];
-  requires: string[];
-}
-
-interface RegistryEntryDetails {
-  status: string;
-  requires: string[];
-}
+import { isString } from './type.helper';
 
 export class Resolver implements IResolver {
   private registry: Record<string, IRegistryEntry | undefined> = {};

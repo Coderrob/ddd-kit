@@ -1,17 +1,23 @@
 import { Command } from 'commander';
 
-import { CommandName, TaskProviderType } from '../../types';
-import { ILogger, IObservabilityLogger } from '../../types/observability';
-import { NextCommandOptions } from '../../types/rendering';
-import { ITaskRepository } from '../../types/repository';
-import { IHydrationOptions, ITask, TaskState } from '../../types/tasks';
-import { TaskProviderFactory } from '../../core/storage/task-provider.factory';
-import { isNullOrUndefined } from '../../core/helpers/type.helper';
 import { TaskHydrationService } from '../../core/processing/hydrate';
-import { Resolver } from '../../core/helpers/uid-resolver';
 import { Renderer } from '../../core/rendering/renderer';
+import { TaskProviderFactory } from '../../core/storage';
 import { ObservabilityLoggerAdapter } from '../../core/system/observability-logger.adapter';
+import {
+  CommandName,
+  IObservabilityLogger,
+  ILogger,
+  IHydrationOptions,
+  TaskProviderType,
+  ITaskRepository,
+  ITask,
+  TaskState,
+  NextCommandOptions,
+} from '../../types';
 import { BaseCommand } from '../shared/base.command';
+import { isNullOrUndefined } from '../../core/helpers/type.helper';
+import { Resolver } from '../../core/helpers/uid-resolver';
 
 import { NextCommandTelemetry, OperationContext } from './next.command.telemetry';
 
