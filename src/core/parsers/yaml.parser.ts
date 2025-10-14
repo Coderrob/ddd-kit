@@ -1,10 +1,9 @@
 import * as path from 'path';
-import { isObject } from 'util';
 
 import { load, dump, JSON_SCHEMA } from 'js-yaml';
 
 import { ILogger, IFileManager, UpdateYamlBlockOptions } from '../../types';
-import { isNonEmptyString } from '../helpers/type.helper';
+import { isNonEmptyString, isObject } from '../helpers/type.helper';
 import { getLogger } from '../system/logger';
 
 /**
