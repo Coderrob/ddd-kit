@@ -121,7 +121,7 @@ export class ConsoleOutputWriter implements IOutputWriter {
         // eslint-disable-next-line security/detect-object-injection
         const values = headers.map((header) => {
           const value = Object.prototype.hasOwnProperty.call(item, header)
-            ? (item as Record<string, unknown>)[header as string]
+            ? (item as Record<string, unknown>)[header]
             : null;
           // Escape quotes and wrap in quotes if contains comma
           const stringValue = String(value ?? '');
