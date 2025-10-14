@@ -1,5 +1,5 @@
-import type { FixRecord } from './FixRecord';
 import { ITask } from './ITask';
+import { TaskFixResult } from './TaskFixResult';
 
 /**
  * Interface for automatically fixing common task validation issues.
@@ -42,5 +42,5 @@ export interface ITaskFixer {
    * // result.fixes contains descriptions of applied fixes
    * ```
    */
-  applyBasicFixes(task: ITask): { fixedTask: ITask; fixes: FixRecord[] };
+  applyBasicFixes(task: ITask): TaskFixResult;
 }
