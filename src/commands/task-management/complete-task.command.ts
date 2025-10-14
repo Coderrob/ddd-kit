@@ -47,8 +47,8 @@ export class CompleteTaskCommand implements ICommand {
       return Promise.reject(message);
     }
 
-    const summary = options.message ?? task.title;
-    const changelogEntry = `${task.id} — ${task.title} — ${summary}`;
+    const summary = options.message ?? task.title ?? '';
+    const changelogEntry = `${task.id} — ${task.title ?? ''} — ${summary}`;
 
     // Handle dry run
     if (options.dryRun === true) {
