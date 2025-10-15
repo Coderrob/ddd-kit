@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 
-import { IOutputWriter } from '../../types/rendering';
+import { IOutputWriter, OutputFormat } from '../../types/rendering';
 import { formatJson } from '../parsers/json.parser';
 import { isNullOrUndefined, isObject } from '../helpers/type.helper';
 
@@ -56,15 +56,15 @@ export class ConsoleOutputWriter implements IOutputWriter {
   /**
    * Writes structured data in the specified format.
    */
-  writeFormatted(data: unknown, format: 'json' | 'csv' | 'table'): void {
+  writeFormatted(data: unknown, format: OutputFormat): void {
     switch (format) {
-      case 'json':
+      case OutputFormat.JSON:
         console.log(formatJson(data));
         break;
-      case 'csv':
+      case OutputFormat.CSV:
         this.writeCsv(data);
         break;
-      case 'table':
+      case OutputFormat.TABLE:
         this.writeTable(data);
         break;
       default:
@@ -118,11 +118,8 @@ export class ConsoleOutputWriter implements IOutputWriter {
     // Write data rows
     data.forEach((item) => {
       if (isObject(item)) {
-        // eslint-disable-next-line security/detect-object-injection
         const values = headers.map((header) => {
-          const value = Object.prototype.hasOwnProperty.call(item, header)
-            ? (item as Record<string, unknown>)[header]
-            : null;
+          const value = Reflect.get(item, header) ?? null;
           // Escape quotes and wrap in quotes if contains comma
           const stringValue = String(value ?? '');
           return stringValue.includes(',') ? `"${stringValue.replace(/"/g, '""')}"` : stringValue;
