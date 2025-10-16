@@ -1,7 +1,7 @@
 import * as path from 'path';
 
-import { FileManager } from '../core/storage/file-manager';
 import { parseJsonFile } from '../core/parsers/json.parser';
+import { FileManager } from '../core/storage/file-manager';
 
 /**
  * Class responsible for loading JSON schema files from the filesystem.

@@ -1,13 +1,13 @@
+import { TaskFixer } from '../core/fixers/task.fixer';
+import { ExclusionFilter } from '../core/processing/exclusion.filter';
 import { ILogger } from '../types/observability';
 import { IExclusionFilter } from '../types/repository';
 import { ITaskFixer, ITaskValidator } from '../types/tasks';
 import { IValidationResultBuilder } from '../types/validation';
-import { TaskFixer } from '../core/fixers/task.fixer';
-import { ExclusionFilter } from '../core/processing/exclusion.filter';
 
+import { AjvValidator } from './ajv.validator';
 import { SchemaLoader } from './schema.loader';
 import { ValidationResultBuilder } from './validation-result.builder';
-import { AjvValidator } from './ajv.validator';
 
 /**
  * Factory for creating validation dependencies.

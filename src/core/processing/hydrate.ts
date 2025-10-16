@@ -1,17 +1,16 @@
 import { createHash } from 'crypto';
 
+import { ILogger, TaskProviderType } from '../../types';
+import { UidResolutionError, UidStatusError } from '../../types/core';
+import { Resolver } from '../helpers/uid-resolver';
+import { Renderer } from '../rendering/renderer';
+import { TaskProviderFactory } from '../storage/task-provider.factory';
 import type {
   ITask,
   IResolvedRef,
   IHydrationOptions,
   ITaskHydrationUseCase,
 } from '../../types/tasks';
-import { ILogger, TaskProviderType } from '../../types';
-import { UidStatusError, UidResolutionError } from '../../types/core';
-import { Resolver } from '../helpers/uid-resolver';
-import { Renderer } from '../rendering/renderer';
-import { TaskProviderFactory } from '../storage/task-provider.factory';
-
 export class TaskHydrationService implements ITaskHydrationUseCase {
   constructor(
     private readonly resolver: Resolver,

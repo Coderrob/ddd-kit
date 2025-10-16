@@ -1,8 +1,8 @@
 import * as path from 'path';
 
 import { IRenderer, IResolvedRef } from '../../types';
-import { FileManager } from '../storage/file-manager';
 import { isNonEmptyString } from '../helpers/type.helper';
+import { FileManager } from '../storage/file-manager';
 
 export class Renderer implements IRenderer {
   private readonly targetPath: string;

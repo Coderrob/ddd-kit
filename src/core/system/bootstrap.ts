@@ -1,7 +1,7 @@
 import { ReferenceAuditService } from '../../services/reference-audit.service';
 import { TaskRenderService } from '../../services/task-render.service';
 import { UidSupersedeService } from '../../services/uid-supersede.service';
-import { SERVICE_KEYS, IServiceRegistry } from '../../types/core';
+import { IServiceRegistry, SERVICE_KEYS } from '../../types/core';
 import { Resolver } from '../helpers/uid-resolver';
 import { getLogger } from '../system/logger';
 

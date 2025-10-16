@@ -1,8 +1,8 @@
-import { ITaskFixer, IExclusionFilter, IValidationResultBuilder, ITask } from '../../types';
+import { IExclusionFilter, ITask, ITaskFixer, IValidationResultBuilder } from '../../types';
 import { ValidationContext } from '../../validators/validation.context';
 import { isTask } from '../helpers/type.helper';
 import { TaskPersistenceService } from '../services/task-persistence.service';
-import { TaskValidationService } from '../services/task-validation-processor.service';
+import { TaskValidationProcessorService } from '../services/task-validation-processor.service';
 
 export class TaskProcessor {
   /**
@@ -15,7 +15,7 @@ export class TaskProcessor {
       exclusionFilter: IExclusionFilter;
       resultBuilder: IValidationResultBuilder;
       context: ValidationContext;
-      validationService: TaskValidationService;
+      validationService: TaskValidationProcessorService;
       persistenceService: TaskPersistenceService;
     },
   ) {}

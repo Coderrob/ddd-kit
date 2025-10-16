@@ -1,19 +1,18 @@
 import { Command } from 'commander';
 
-import { ILogger } from '../../types/observability';
-import { AddTaskCommand } from '../task-management/add-task.command';
-import { CompleteTaskCommand } from '../task-management/complete-task.command';
-import { ListTasksCommand } from '../task-management/list-tasks.command';
-import { ShowTaskCommand } from '../task-management/show-task.command';
-import { ValidateAndFixCommand } from '../validation/validate-and-fix.command';
-import { ValidateTasksCommand } from '../validation/validate-tasks.command';
-import { NextCommand } from '../rendering/next.command';
-import { RenderCommand } from '../rendering/render.command';
-import { RefAuditCommand } from '../audit/ref-audit.command';
-import { SupersedeCommand } from '../audit/supersede.command';
-import { IOutputWriter } from '../../types/rendering';
+import { ILogger, IOutputWriter } from '../types';
 
+import { AddTaskCommand } from './add-task.command';
 import { CommandFactory } from './command.factory';
+import { CompleteTaskCommand } from './complete-task.command';
+import { ListTasksCommand } from './list-tasks.command';
+import { NextCommand } from './next.command';
+import { RefAuditCommand } from './ref-audit.command';
+import { RenderCommand } from './render.command';
+import { ShowTaskCommand } from './show-task.command';
+import { SupersedeCommand } from './supersede.command';
+import { ValidateAndFixCommand } from './validate-and-fix.command';
+import { ValidateTasksCommand } from './validate-tasks.command';
 
 // Mock chalk to handle ES module import issues
 jest.mock('chalk', () => ({

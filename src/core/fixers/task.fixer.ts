@@ -1,9 +1,9 @@
 import { FixRecord, IFixerOptions, ITask, TaskFixResult } from '../../types/tasks';
 
-import { fixPriority } from './priority.fixer';
-import { fixStatus } from './status.fixer';
 import { fixDateField } from './dates.fixer';
 import { fixOwner } from './owner.fixer';
+import { fixPriority } from './priority.fixer';
+import { fixStatus } from './status.fixer';
 
 /**
  * Class responsible for applying automatic fixes to task objects that have validation issues.
@@ -34,14 +34,14 @@ export class TaskFixer {
     fixedTask = fixStatus(fixedTask, fixes, id);
     fixedTask = fixDateField({
       nowIso: this.nowIso,
-      asObj: fixedTask,
+      task: fixedTask,
       field: 'created',
       fixes,
       id,
     });
     fixedTask = fixDateField({
       nowIso: this.nowIso,
-      asObj: fixedTask,
+      task: fixedTask,
       field: 'updated',
       fixes,
       id,

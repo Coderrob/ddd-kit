@@ -1,11 +1,7 @@
 import { Command } from 'commander';
 
-import { ILogger } from '../../types/observability';
-import { TaskManager } from '../../core/storage/task.manager';
-import { AddTaskArgs } from '../../types/tasks';
-import { EXIT_CODES } from '../../types/core';
-import { IOutputWriter } from '../../types/rendering';
-import { CommandName } from '../../types';
+import { TaskManager } from '../core/storage';
+import { AddTaskArgs, CommandName, EXIT_CODES, ILogger, IOutputWriter } from '../types';
 
 import { AddTaskCommand } from './add-task.command';
 

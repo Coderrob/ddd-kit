@@ -1,13 +1,11 @@
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 
-import { ITaskStore, ITask } from '../types/tasks';
-import { ILogger } from '../types/observability';
 import { TaskValidationService } from '../services/task-validation.service';
-import { IValidationResult } from '../types';
+import { IValidationOptions, IValidationResult, ITask } from '../types';
 
-import { SchemaLoader } from './schema.loader';
 import { AjvValidator } from './ajv.validator';
+import { SchemaLoader } from './schema.loader';
 
 const ajv = new Ajv({ allErrors: true, strict: false });
 addFormats(ajv);
@@ -63,10 +61,11 @@ export function validateTasks(tasks: ITask[]): IValidationResult {
  * 4. Detailed reporting of validation results and applied fixes
  *
  * @param tasks - Array of Task objects to validate and potentially fix
- * @param applyFixes - Whether to actually apply the fixes to the task store (true) or just report them (false)
- * @param excludePattern - Optional glob pattern to exclude certain tasks from validation/fixes (e.g., "T-001")
- * @param store - Optional custom task store implementation for persisting changes (defaults to DefaultTaskStore)
- * @param logger - Optional logger instance for debugging and progress reporting
+ * @param options - Options for the validation and fixing operation:
+ *   - applyFixes: boolean indicating if fixes should be applied to the task store
+ *   - excludePattern?: optional regex pattern to exclude certain tasks from validation/fixing
+ *   - store?: optional ITaskStore instance to use for persisting fixes (defaults to in-memory store)
+ *   - logger?: optional ILogger instance for logging (defaults to console logger)
  * @returns Promise resolving to an object containing:
  *   - valid: boolean indicating if all tasks passed validation (after fixes)
  *   - errors: array of remaining validation error messages (only present if valid is false)
@@ -75,12 +74,7 @@ export function validateTasks(tasks: ITask[]): IValidationResult {
  */
 export async function validateAndFixTasks(
   tasks: ITask[],
-  options: {
-    applyFixes: boolean;
-    excludePattern?: string;
-    store?: ITaskStore;
-    logger?: ILogger;
-  },
+  options: IValidationOptions,
 ): Promise<IValidationResult> {
   const service = new TaskValidationService();
   const result = await service.validateAndFixTasks(tasks, options);

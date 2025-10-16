@@ -12,17 +12,17 @@ import { FixRecord, ITask } from '../../types/tasks';
  * @returns A new task object with the field updated, or the original object if no change was needed.
  */
 export function setIfChangedImmutable(params: {
-  asObj: ITask;
+  task: ITask;
   field: keyof ITask;
   next: unknown;
   fixes: FixRecord[];
   id: string;
 }): ITask {
-  const { asObj, field, next, fixes, id } = params;
+  const { task, field, next, fixes, id } = params;
   // eslint-disable-next-line security/detect-object-injection
-  const current = asObj[field];
-  if (current === next) return asObj;
+  const current = task[field];
+  if (current === next) return task;
   fixes.push({ field: String(field), id, new: next as string, old: current as string });
   // Create a new object with the updated field
-  return { ...asObj, [field]: next };
+  return { ...task, [field]: next };
 }

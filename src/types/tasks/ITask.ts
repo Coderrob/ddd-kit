@@ -1,4 +1,5 @@
 import { IResolvedReference } from './IResolvedReference';
+import { TaskPriority } from './TaskPriority';
 import { TaskState } from './TaskState';
 import { TaskStatus } from './TaskStatus';
 
@@ -8,6 +9,7 @@ export interface ITask {
   title?: string;
   state?: TaskState;
   status?: TaskStatus;
+  priority?: TaskPriority;
   references?: string[];
   owner?: string;
   due?: string;

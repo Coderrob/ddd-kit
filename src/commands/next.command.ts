@@ -1,25 +1,27 @@
 import { Command } from 'commander';
 
-import { TaskHydrationService } from '../../core/processing/hydrate';
-import { Renderer } from '../../core/rendering/renderer';
-import { TaskProviderFactory } from '../../core/storage';
-import { ObservabilityLoggerAdapter } from '../../core/system/observability-logger.adapter';
+import { EnvironmentAccessor, ProcessEnvironmentAccessor } from '../core/helpers/env.helper';
+import { isNullOrUndefined } from '../core/helpers/type.helper';
+import { Resolver } from '../core/helpers/uid-resolver';
+import { TaskHydrationService } from '../core/processing/hydrate';
+import { Renderer } from '../core/rendering/renderer';
+import { TaskProviderFactory } from '../core/storage';
+import { ObservabilityLoggerAdapter } from '../core/system/observability-logger.adapter';
 import {
   CommandName,
-  IObservabilityLogger,
-  ILogger,
   IHydrationOptions,
-  TaskProviderType,
-  ITaskRepository,
+  ILogger,
+  IObservabilityLogger,
   ITask,
-  TaskState,
+  ITaskRepository,
   NextCommandOptions,
-} from '../../types';
-import { BaseCommand } from '../shared/base.command';
-import { isNullOrUndefined } from '../../core/helpers/type.helper';
-import { Resolver } from '../../core/helpers/uid-resolver';
+  OperationContext,
+  TaskProviderType,
+  TaskState,
+} from '../types';
 
-import { NextCommandTelemetry, OperationContext } from './next.command.telemetry';
+import { BaseCommand } from './base.command';
+import { NextCommandTelemetry } from './next.command.telemetry';
 
 /**
  * Command for hydrating the next task.
@@ -35,11 +37,17 @@ export class NextCommand extends BaseCommand {
   private readonly hydrationService: TaskHydrationService;
   private readonly observabilityLogger: IObservabilityLogger;
   private readonly telemetry: NextCommandTelemetry;
+  private readonly environment: EnvironmentAccessor;
 
-  constructor(logger: ILogger, observabilityLogger?: IObservabilityLogger) {
+  constructor(
+    logger: ILogger,
+    observabilityLogger?: IObservabilityLogger,
+    environment?: EnvironmentAccessor,
+  ) {
     super(logger);
-    const dddKitPath = process.env['DDDKIT_PATH'] ?? '.';
-    const targetPath = process.env['TARGET_REPO_PATH'] ?? '.';
+    this.environment = environment ?? new ProcessEnvironmentAccessor();
+    const dddKitPath = this.environment.getOrDefault('DDDKIT_PATH', '.');
+    const targetPath = this.environment.getOrDefault('TARGET_REPO_PATH', '.');
     const resolver = new Resolver(dddKitPath);
     const renderer = new Renderer(targetPath);
     this.hydrationService = new TaskHydrationService(resolver, renderer, logger);
@@ -131,8 +139,8 @@ export class NextCommand extends BaseCommand {
     provider: ITaskRepository,
   ): Promise<void> {
     // Get environment configuration
-    const dddKitPath = process.env['DDDKIT_PATH'] ?? '.';
-    const targetPath = process.env['TARGET_REPO_PATH'] ?? '.';
+    const dddKitPath = this.environment.getOrDefault('DDDKIT_PATH', '.');
+    const targetPath = this.environment.getOrDefault('TARGET_REPO_PATH', '.');
 
     // Hydrate the task using the injected service
     await this.hydrationService.hydrateTask(task, dddKitPath, targetPath, options.pin);

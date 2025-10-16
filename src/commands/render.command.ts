@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 
-import { container } from '../../core/system/container';
+import { container } from '../core/system/container';
 import {
   CommandName,
   IRenderOptions,
@@ -8,8 +8,9 @@ import {
   SERVICE_KEYS,
   ILogger,
   RenderCommandOptions,
-} from '../../types';
-import { BaseCommand } from '../shared/base.command';
+} from '../types';
+
+import { BaseCommand } from './base.command';
 
 /**
  * Command for rendering a specific task.

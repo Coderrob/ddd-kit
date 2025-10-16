@@ -1,18 +1,20 @@
 import { Command } from 'commander';
 
-import { isEmptyArray } from '../../core/helpers/array.helper';
-import { isNonEmptyString } from '../../core/helpers/type.helper';
-import { ValidationResultRenderer } from '../../core/rendering/validation-result.renderer';
-import { TaskManager } from '../../core/storage';
+import { isEmptyArray } from '../core/helpers/array.helper';
+import { isNonEmptyString } from '../core/helpers/type.helper';
+import { ValidationResultRenderer } from '../core/rendering/validation-result.renderer';
+import { TaskManager } from '../core/storage';
 import {
-  ILogger,
-  ValidateFixCommandOptions,
-  IValidationResult,
   EXIT_CODES,
+  ILogger,
   IOutputWriter,
-} from '../../types';
-import { validateAndFixTasks } from '../../validators/validator';
-import { BaseCommand } from '../shared/base.command';
+  IValidationOptions,
+  IValidationResult,
+  ValidateFixCommandOptions,
+} from '../types';
+import { validateAndFixTasks } from '../validators/validator';
+
+import { BaseCommand } from './base.command';
 
 /**
  * Modern command for validating tasks and optionally applying automatic fixes.
@@ -42,12 +44,11 @@ export class ValidateAndFixCommand extends BaseCommand {
    * 4. Handles different output formats (console, JSON, CSV)
    * 5. Provides detailed feedback about validation results and applied fixes
    *
-   * @param args - Optional runtime arguments that override constructor defaults
-   * @param args.fix - Whether to automatically apply fixes (overrides constructor option)
-   * @param args.dryRun - Whether to simulate fixes without applying them (overrides constructor option)
-   * @param args.summary - Output format configuration (overrides constructor option)
-   * @param args.summary.format - The output format: 'json' or 'csv'
-   * @param args.exclude - Glob pattern to exclude tasks from validation (overrides constructor option)
+   * @param options - Command options including fix, dryRun, format, and exclude
+   *  - fix: boolean indicating if fixes should be applied
+   *  - dryRun: boolean indicating if changes should be simulated without applying
+   *  - format: output format (json, csv)
+   *  - exclude: optional pattern to exclude certain tasks from validation/fixing
    * @returns Promise that resolves when the command execution is complete
    *
    * @throws Will set process.exitCode to 5 if validation errors remain after fixing
@@ -64,7 +65,7 @@ export class ValidateAndFixCommand extends BaseCommand {
    */
   private performValidation(options: ValidateFixCommandOptions) {
     const todoManager = new TaskManager(this.logger);
-    const validationOptions: Parameters<typeof validateAndFixTasks>[1] = {
+    const validationOptions: IValidationOptions = {
       applyFixes: Boolean(options.fix) && options.dryRun !== true,
     };
     if (isNonEmptyString(options.exclude)) {

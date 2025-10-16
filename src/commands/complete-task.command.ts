@@ -1,16 +1,16 @@
 import { Command } from 'commander';
 
-import { ConsoleOutputWriter } from '../../core/rendering';
-import { TaskManager } from '../../core/storage';
+import { ConsoleOutputWriter } from '../core/rendering';
+import { TaskManager } from '../core/storage';
 import {
-  ICommand,
   CommandName,
-  ILogger,
-  IOutputWriter,
   CompleteTaskArgs,
   CompleteTaskOptions,
   EXIT_CODES,
-} from '../../types';
+  ICommand,
+  ILogger,
+  IOutputWriter,
+} from '../types';
 
 /**
  * Command for completing a task by removing it

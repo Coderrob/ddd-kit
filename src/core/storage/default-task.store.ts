@@ -1,4 +1,4 @@
-import { ITaskStore, ITask } from '../../types';
+import { ITask, ITaskStore } from '../../types';
 
 import { TaskManager } from './task.manager';
 

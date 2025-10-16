@@ -1,4 +1,4 @@
-import { TaskProviderType, ILogger, ITaskRepository } from '../../types';
+import { ILogger, ITaskRepository, TaskProviderType } from '../../types';
 
 import { IssuesProvider } from './issues.provider';
 import { ProjectsProvider } from './projects.provider';

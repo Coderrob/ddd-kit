@@ -1,14 +1,15 @@
 import { Command } from 'commander';
 
-import { container } from '../../core/system/container';
+import { container } from '../core/system/container';
 import {
   CommandName,
+  ILogger,
   ISupersedeOptions,
   IUIdSupersedeUseCase,
   SERVICE_KEYS,
-  ILogger,
-} from '../../types';
-import { BaseCommand } from '../shared/base.command';
+} from '../types';
+
+import { BaseCommand } from './base.command';
 
 /**
  * Command for superseding UIDs.

@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import { IResolver, IRegistryEntry, RegistryEntryDetails } from '../../types';
+import { IRegistryEntry, IResolver, RegistryEntryDetails } from '../../types';
 import { parseJsonFile } from '../parsers/json.parser';
 import { FileManager } from '../storage';
 

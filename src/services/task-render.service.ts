@@ -2,7 +2,7 @@ import { Resolver } from '../core/helpers/uid-resolver';
 import { TaskHydrationService } from '../core/processing/hydrate';
 import { Renderer } from '../core/rendering/renderer';
 import { TaskProviderFactory } from '../core/storage';
-import { ITaskRenderUseCase, ILogger, IRenderOptions, TaskProviderType } from '../types';
+import { ILogger, IRenderOptions, ITaskRenderUseCase, TaskProviderType } from '../types';
 
 export class TaskRenderService implements ITaskRenderUseCase {
   private readonly hydrationService: TaskHydrationService;

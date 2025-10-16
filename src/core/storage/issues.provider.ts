@@ -1,11 +1,11 @@
 import {
-  ITaskRepository,
-  ILogger,
-  ITask,
-  isGitHubIssue,
   GitHubLabel,
-  TaskStatus,
+  ILogger,
+  isGitHubIssue,
+  ITask,
+  ITaskRepository,
   TaskState,
+  TaskStatus,
 } from '../../types';
 import { isNonEmptyString, isNullOrUndefined, isString } from '../helpers/type.helper';
 import { formatJson } from '../parsers/json.parser';

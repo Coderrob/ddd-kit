@@ -1,9 +1,9 @@
 import {
-  ILogger,
-  ValidateFixCommandOptions,
   FixRecord,
-  OutputFormat,
+  ILogger,
   IValidationResult,
+  OutputFormat,
+  ValidateFixCommandOptions,
 } from '../../types';
 import { IOutputWriter } from '../../types/rendering';
 

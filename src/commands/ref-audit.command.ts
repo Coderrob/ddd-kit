@@ -1,8 +1,9 @@
 import { Command } from 'commander';
 
-import { container } from '../../core/system/container';
-import { CommandName, IReferenceAuditUseCase, SERVICE_KEYS, ILogger } from '../../types';
-import { BaseCommand } from '../shared/base.command';
+import { container } from '../core/system/container';
+import { CommandName, ILogger, IReferenceAuditUseCase, SERVICE_KEYS } from '../types';
+
+import { BaseCommand } from './base.command';
 
 /**
  * Command for auditing references.

@@ -18,15 +18,15 @@ import { setIfChangedImmutable } from './fixer-utils';
  */
 export function fixDateField(params: {
   nowIso: string;
-  asObj: ITask;
+  task: ITask;
   field: 'created' | 'updated';
   fixes: FixRecord[];
   id: string;
 }): ITask {
-  const { nowIso, asObj, field, fixes, id } = params;
+  const { nowIso, task, field, fixes, id } = params;
   // eslint-disable-next-line security/detect-object-injection
-  const current = String((asObj as Record<string, unknown>)[field] ?? '');
+  const current = String(task[field] ?? '');
   const normalized = normalizeToIso(nowIso, current);
-  if (current === normalized) return asObj;
-  return setIfChangedImmutable({ asObj, field, next: normalized, fixes, id });
+  if (current === normalized) return task;
+  return setIfChangedImmutable({ task, field, next: normalized, fixes, id });
 }

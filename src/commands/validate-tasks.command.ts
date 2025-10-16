@@ -1,9 +1,10 @@
 import { Command } from 'commander';
 
-import { TaskManager } from '../../core/storage';
-import { EXIT_CODES, ILogger } from '../../types';
-import { validateTasks } from '../../validators/validator';
-import { BaseCommand } from '../shared/base.command';
+import { TaskManager } from '../core/storage';
+import { EXIT_CODES, ILogger } from '../types';
+import { validateTasks } from '../validators/validator';
+
+import { BaseCommand } from './base.command';
 
 /**
  * Modern command for validating all tasks in TODO.md against the task schema.

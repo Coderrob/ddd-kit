@@ -1,8 +1,8 @@
 import * as path from 'path';
 
-import { load, dump, JSON_SCHEMA } from 'js-yaml';
+import { dump, JSON_SCHEMA, load } from 'js-yaml';
 
-import { ILogger, IFileManager, UpdateYamlBlockOptions } from '../../types';
+import { IFileManager, ILogger, UpdateYamlBlockOptions } from '../../types';
 import { isNonEmptyString, isObject } from '../helpers/type.helper';
 import { getLogger } from '../system/logger';
 

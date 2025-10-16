@@ -1,8 +1,8 @@
 import chalk from 'chalk';
 
 import { IOutputWriter, OutputFormat } from '../../types/rendering';
-import { formatJson } from '../parsers/json.parser';
 import { isNullOrUndefined, isObject } from '../helpers/type.helper';
+import { formatJson } from '../parsers/json.parser';
 
 /**
  * Console-based implementation of IOutputWriter.

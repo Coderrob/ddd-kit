@@ -1,7 +1,8 @@
 import { DefaultTaskStore } from '../core/storage/default-task.store';
 import { getLogger } from '../core/system/logger';
-import { ITaskStore } from '../types/tasks';
+import { IValidationOptions } from '../types';
 import { ILogger } from '../types/observability';
+import { ITask, ITaskStore } from '../types/tasks';
 
 /**
  * Context object for task validation operations.
@@ -13,13 +14,8 @@ export class ValidationContext {
    * @param options - Options for the validation context.
    */
   constructor(
-    public readonly tasks: unknown[],
-    public readonly options: {
-      applyFixes: boolean;
-      excludePattern?: string;
-      store?: ITaskStore;
-      logger?: ILogger;
-    },
+    public readonly tasks: ITask[],
+    public readonly options: IValidationOptions,
   ) {}
 
   /**

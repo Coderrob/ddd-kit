@@ -1,17 +1,18 @@
 import { Command } from 'commander';
 
-import { ConsoleOutputWriter } from '../../core/rendering';
-import { TaskManager } from '../../core/storage';
+import { ConsoleOutputWriter } from '../core/rendering';
+import { TaskManager } from '../core/storage';
 import {
   CommandName,
+  EXIT_CODES,
   ILogger,
   IOutputWriter,
-  TodoShowCommandArgs,
-  EXIT_CODES,
-  TaskDetails,
   OutputFormat,
-} from '../../types';
-import { BaseCommand } from '../shared/base.command';
+  TaskDetails,
+  TodoShowCommandArgs,
+} from '../types';
+
+import { BaseCommand } from './base.command';
 
 /**
  * Modern command for showing detailed information about a specific task.

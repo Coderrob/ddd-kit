@@ -1,13 +1,13 @@
 import {
-  ITaskRepository,
+  GitHubProjectIssue,
+  GraphQLResponse,
+  hasContent,
   ILogger,
   ITask,
-  hasContent,
-  GraphQLResponse,
+  ITaskRepository,
   ProjectV2Item,
-  TaskStatus,
   TaskState,
-  GitHubProjectIssue,
+  TaskStatus,
 } from '../../types';
 import { isNonEmptyString } from '../helpers/type.helper';
 import { formatJson } from '../parsers/json.parser';

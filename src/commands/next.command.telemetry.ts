@@ -1,12 +1,10 @@
 import {
-  OperationContext,
-  IObservabilityLogger,
-  IHydrationOptions,
   CommandName,
+  IHydrationOptions,
+  IObservabilityLogger,
+  OperationContext,
   TaskProviderType,
-} from '../../types';
-
-export type { OperationContext };
+} from '../types';
 
 export class NextCommandTelemetry {
   /**

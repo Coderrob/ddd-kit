@@ -1,16 +1,22 @@
 /* eslint-disable no-undefined */
 import { Command } from 'commander';
 
-import { ILogger, IObservabilityLogger } from '../../types/observability';
-import { ITaskRepository } from '../../types/repository';
-import { IHydrationOptions, ITask, TaskState } from '../../types/tasks';
-import { TaskProviderType } from '../../types';
-import { TaskProviderFactory } from '../../core/storage/task-provider.factory';
-import { TaskHydrationService } from '../../core/processing/hydrate';
-import { ObservabilityLoggerAdapter } from '../../core/system/observability-logger.adapter';
+import { TaskHydrationService } from '../core/processing/hydrate';
+import { TaskProviderFactory } from '../core/storage';
+import { ObservabilityLoggerAdapter } from '../core/system/observability-logger.adapter';
+import {
+  IHydrationOptions,
+  ILogger,
+  IObservabilityLogger,
+  ITask,
+  ITaskRepository,
+  OperationContext,
+  TaskProviderType,
+  TaskState,
+} from '../types';
 
 import { NextCommand } from './next.command';
-import { NextCommandTelemetry, OperationContext } from './next.command.telemetry';
+import { NextCommandTelemetry } from './next.command.telemetry';
 
 jest.mock('../../core/storage/task-provider.factory');
 jest.mock('../../core/processing/hydrate');

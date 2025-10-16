@@ -10,15 +10,15 @@ import { setIfChangedImmutable } from './fixer-utils';
  * value differs from the original, it returns a new task object with the updated field
  * and records the change in the provided fixes array.
  *
- * @param asObj - The original task object (not modified).
+ * @param task - The original task object (not modified).
  * @param fixes - Array to record any changes made.
  * @param id - The ID of the task being modified (for logging purposes).
  * @returns A new task object with the fixed owner field, or the original object if no change was needed.
  */
-export function fixOwner(asObj: ITask, fixes: FixRecord[], id: string): ITask {
-  const raw = String((asObj as Record<string, unknown>)['owner'] ?? '');
+export function fixOwner(task: ITask, fixes: FixRecord[], id: string): ITask {
+  const raw = String(task.owner ?? '');
   const trimmed = raw.trim();
-  if (trimmed === '') return asObj;
+  if (trimmed === '') return task;
 
   const collapsed = trimmed.replace(/\s+/g, ' ');
   const title = collapsed
@@ -27,6 +27,6 @@ export function fixOwner(asObj: ITask, fixes: FixRecord[], id: string): ITask {
     .map((s) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase())
     .join(' ');
 
-  if (title === raw) return asObj;
-  return setIfChangedImmutable({ asObj, field: 'owner', next: title, fixes, id });
+  if (title === raw) return task;
+  return setIfChangedImmutable({ task, field: 'owner', next: title, fixes, id });
 }

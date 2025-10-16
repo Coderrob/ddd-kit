@@ -1,10 +1,8 @@
 /* eslint-disable no-undefined */
 import { Command } from 'commander';
 
-import { container } from '../../core/system/container';
-import { SERVICE_KEYS } from '../../types/core';
-import { ILogger } from '../../types/observability';
-import { CommandName, IUIdSupersedeUseCase } from '../../types';
+import { container } from '../core/system/container';
+import { CommandName, ILogger, IUIdSupersedeUseCase, SERVICE_KEYS } from '../types';
 
 import { SupersedeCommand } from './supersede.command';
 

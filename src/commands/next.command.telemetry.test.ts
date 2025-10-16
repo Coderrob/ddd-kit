@@ -1,9 +1,13 @@
 /* eslint-disable no-undefined */
-import { CommandName } from '../../types';
-import { IObservabilityLogger } from '../../types/observability';
-import { IHydrationOptions, TaskProviderType } from '../../types/tasks';
+import {
+  CommandName,
+  IHydrationOptions,
+  IObservabilityLogger,
+  OperationContext,
+  TaskProviderType,
+} from '../types';
 
-import { NextCommandTelemetry, OperationContext } from './next.command.telemetry';
+import { NextCommandTelemetry } from './next.command.telemetry';
 
 describe('NextCommandTelemetry', () => {
   let telemetry: NextCommandTelemetry;

@@ -1,14 +1,14 @@
 import * as path from 'path';
 
-import { ITaskStore, IChangelogStore, ILogger, ITask } from '../../types';
+import { IChangelogStore, ILogger, ITask, ITaskStore } from '../../types';
+import { isNullOrUndefined } from '../helpers/type.helper';
 import {
-  parseYamlBlocksFromFile,
   addYamlBlockFromFile,
-  updateYamlBlockById,
+  parseYamlBlocksFromFile,
   removeYamlBlockById,
+  updateYamlBlockById,
 } from '../parsers/yaml.parser';
 import { getLogger } from '../system/logger';
-import { isNullOrUndefined } from '../helpers/type.helper';
 
 import { FileManager } from './file-manager';
 
