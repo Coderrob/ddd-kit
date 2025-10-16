@@ -5,6 +5,7 @@ import { isNonEmptyString } from '../core/helpers/type.helper';
 import { ValidationResultRenderer } from '../core/rendering/validation-result.renderer';
 import { TaskManager } from '../core/storage';
 import {
+  CommandName,
   EXIT_CODES,
   ILogger,
   IOutputWriter,
@@ -24,7 +25,7 @@ import { BaseCommand } from './base.command';
  * apply automatic fixes for common issues, and provide detailed reporting in various formats.
  */
 export class ValidateAndFixCommand extends BaseCommand {
-  override name = 'fix';
+  override name = CommandName.FIX;
   override description = 'Validate and fix tasks';
 
   constructor(

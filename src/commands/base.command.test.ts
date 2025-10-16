@@ -1,10 +1,10 @@
-import { ILogger, IOutputWriter } from '../types';
+import { ILogger, IOutputWriter, CommandName } from '../types';
 
 import { BaseCommand } from './base.command';
 
 describe('BaseCommand', () => {
   class TestCommand extends BaseCommand {
-    name = 'test';
+    name = CommandName.ADD;
     description = 'test command';
 
     async execute(_args?: unknown): Promise<void> {

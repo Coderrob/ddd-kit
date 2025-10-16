@@ -3,7 +3,7 @@ import {
   CommandName,
   IHydrationOptions,
   IObservabilityLogger,
-  OperationContext,
+  IOperationContext,
   TaskProviderType,
 } from '../types';
 
@@ -88,7 +88,7 @@ describe('NextCommandTelemetry', () => {
 
   describe('noTaskFound', () => {
     it('should log warning, counter, and event for no tasks found', () => {
-      const op: OperationContext = {
+      const op: IOperationContext = {
         operationLogger: mockOperationLogger,
         startTime: new Date(),
         stopTimer: jest.fn(),
@@ -115,7 +115,7 @@ describe('NextCommandTelemetry', () => {
     });
 
     it('should handle undefined provider', () => {
-      const op: OperationContext = {
+      const op: IOperationContext = {
         operationLogger: mockOperationLogger,
         startTime: new Date(),
         stopTimer: jest.fn(),
@@ -140,7 +140,7 @@ describe('NextCommandTelemetry', () => {
   describe('success', () => {
     it('should log success span, info, counter, and event', () => {
       const startTime = new Date();
-      const op: OperationContext = {
+      const op: IOperationContext = {
         operationLogger: mockOperationLogger,
         startTime,
         stopTimer: jest.fn(),
@@ -180,7 +180,7 @@ describe('NextCommandTelemetry', () => {
     });
 
     it('should handle undefined provider', () => {
-      const op: OperationContext = {
+      const op: IOperationContext = {
         operationLogger: mockOperationLogger,
         startTime: new Date(),
         stopTimer: jest.fn(),
@@ -207,7 +207,7 @@ describe('NextCommandTelemetry', () => {
   describe('error', () => {
     it('should log error span, error, counter, and event for Error instance', () => {
       const startTime = new Date();
-      const op: OperationContext = {
+      const op: IOperationContext = {
         operationLogger: mockOperationLogger,
         startTime,
         stopTimer: jest.fn(),
@@ -246,7 +246,7 @@ describe('NextCommandTelemetry', () => {
     });
 
     it('should handle non-Error err', () => {
-      const op: OperationContext = {
+      const op: IOperationContext = {
         operationLogger: mockOperationLogger,
         startTime: new Date(),
         stopTimer: jest.fn(),

@@ -13,7 +13,7 @@ import {
 
 import { RenderCommand } from './render.command';
 
-jest.mock('../../core/system/container');
+jest.mock('../core/system/container');
 jest.mock('commander');
 
 describe('RenderCommand', () => {

@@ -6,7 +6,7 @@ import { AddTaskArgs, CommandName, EXIT_CODES, ILogger, IOutputWriter } from '..
 import { AddTaskCommand } from './add-task.command';
 
 // Mock dependencies
-jest.mock('../../core/storage/task.manager');
+jest.mock('../core/storage');
 jest.mock('commander');
 
 describe('AddTaskCommand', () => {

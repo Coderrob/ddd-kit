@@ -6,7 +6,7 @@ import { CommandName, ILogger, IUIdSupersedeUseCase, SERVICE_KEYS } from '../typ
 
 import { SupersedeCommand } from './supersede.command';
 
-jest.mock('../../core/system/container');
+jest.mock('../core/system/container');
 jest.mock('commander');
 
 describe('SupersedeCommand', () => {

@@ -6,7 +6,7 @@ import { CommandName, ILogger, IReferenceAuditUseCase, SERVICE_KEYS } from '../t
 
 import { RefAuditCommand } from './ref-audit.command';
 
-jest.mock('../../core/system/container');
+jest.mock('../core/system/container');
 jest.mock('commander');
 
 describe('RefAuditCommand', () => {

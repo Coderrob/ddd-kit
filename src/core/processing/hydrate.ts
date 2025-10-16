@@ -11,6 +11,7 @@ import type {
   IHydrationOptions,
   ITaskHydrationUseCase,
 } from '../../types/tasks';
+
 export class TaskHydrationService implements ITaskHydrationUseCase {
   constructor(
     private readonly resolver: Resolver,

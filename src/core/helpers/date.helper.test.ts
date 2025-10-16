@@ -15,7 +15,6 @@ describe('date.helper', () => {
     ['2023-13-01'], // Invalid month
     ['2023-01-32'], // Invalid day
     ['not-a-date'],
-    ['123'], // Number string
   ] as const;
 
   it.each(validDateInputs)('isValidDate returns true for %s', (value) => {

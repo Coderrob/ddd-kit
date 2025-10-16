@@ -2,7 +2,7 @@ import {
   CommandName,
   IHydrationOptions,
   IObservabilityLogger,
-  OperationContext,
+  IOperationContext,
   TaskProviderType,
 } from '../types';
 
@@ -13,7 +13,7 @@ export class NextCommandTelemetry {
    * @param options - The hydration options used
    * @returns OperationContext containing logger, start time, and timer stop function
    */
-  recordStart(obs: IObservabilityLogger, options: IHydrationOptions): OperationContext {
+  recordStart(obs: IObservabilityLogger, options: IHydrationOptions): IOperationContext {
     const correlationId = obs.createCorrelationId();
     const operationLogger = obs.withCorrelation(correlationId, 'next_command_execution', {
       provider: options.provider,
@@ -45,7 +45,7 @@ export class NextCommandTelemetry {
    * @param op - The operation context
    * @param options - The hydration options used
    */
-  noTaskFound(op: OperationContext, options: IHydrationOptions): void {
+  noTaskFound(op: IOperationContext, options: IHydrationOptions): void {
     op.operationLogger.warn('No eligible tasks found for next command', {
       provider: options.provider ?? TaskProviderType.TASK,
       filters: options.filters,
@@ -66,7 +66,7 @@ export class NextCommandTelemetry {
    * @param taskId - The ID of the hydrated task
    * @param provider - The task provider type
    */
-  success(op: OperationContext, taskId: string, provider: string | undefined): void {
+  success(op: IOperationContext, taskId: string, provider: string | undefined): void {
     const endTime = new Date();
     const duration = endTime.getTime() - op.startTime.getTime();
     op.stopTimer();
@@ -99,7 +99,7 @@ export class NextCommandTelemetry {
    * @param err - The error that occurred
    * @param provider - The task provider type
    */
-  error(op: OperationContext, err: unknown, provider: string | undefined): void {
+  error(op: IOperationContext, err: unknown, provider: string | undefined): void {
     const endTime = new Date();
     const duration = endTime.getTime() - op.startTime.getTime();
     op.stopTimer();

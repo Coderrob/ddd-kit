@@ -11,7 +11,7 @@ import { getLogger } from '../system/logger';
  * @param md - The markdown content to parse.
  * @returns An array of YAML block contents.
  */
-function extractYamlBlocks(md: string): string[] {
+export function extractYamlBlocks(md: string): string[] {
   const blocks: string[] = [];
   const pattern = /---\r?\n([\s\S]*?)\r?\n---/g;
   let match: RegExpExecArray | null;
@@ -29,7 +29,7 @@ function extractYamlBlocks(md: string): string[] {
  * @param logger - Optional logger.
  * @returns The parsed object or null if failed.
  */
-function parseYamlBlock<T extends Record<string, unknown>>(
+export function parseYamlBlock<T extends Record<string, unknown>>(
   block: string,
   logger?: ILogger,
 ): T | null {
@@ -53,7 +53,7 @@ function parseYamlBlock<T extends Record<string, unknown>>(
  * @param obj - The object to dump.
  * @returns The YAML string representation.
  */
-function dumpYaml(obj: Record<string, unknown>): string {
+export function dumpYaml(obj: Record<string, unknown>): string {
   return dump(obj);
 }
 
@@ -139,20 +139,27 @@ export function updateYamlBlockById(options: UpdateYamlBlockOptions): boolean {
   const log = logger ?? getLogger();
   try {
     const content = fileSystem.readFileSync(filePath);
-    const parts = content.split(/---\r?\n/);
+    const blockPattern = /---\r?\n(?!---\r?\n)([\s\S]*?)\r?\n---/g;
+    let match: RegExpExecArray | null;
+    let updatedContent = content;
     let found = false;
 
-    for (let i = 1; i < parts.length; i += 2) {
-      // eslint-disable-next-line security/detect-object-injection
-      const yamlContent = parts[i];
-      if (isNonEmptyString(yamlContent)) {
-        const parsed = parseYamlBlock(yamlContent, log);
-        if (parsed && parsed['id'] === id) {
-          // eslint-disable-next-line security/detect-object-injection
-          parts[i] = dumpYaml({ ...parsed, ...updatedData });
-          found = true;
-          break;
-        }
+    while ((match = blockPattern.exec(content)) !== null) {
+      const fullBlock = match[0];
+      const yamlContent = match[1];
+
+      if (!isNonEmptyString(yamlContent)) {
+        continue;
+      }
+
+      const parsed = parseYamlBlock(yamlContent, log);
+      if (parsed && parsed['id'] === id) {
+        const merged = { ...parsed, ...updatedData };
+        const dumped = dumpYaml(merged).trimEnd();
+        const replacement = `---\n${dumped}\n---`;
+        updatedContent = updatedContent.replace(fullBlock, replacement);
+        found = true;
+        break;
       }
     }
 
@@ -161,8 +168,7 @@ export function updateYamlBlockById(options: UpdateYamlBlockOptions): boolean {
       return false;
     }
 
-    const newContent = parts.join('---\n');
-    fileSystem.writeFileSync(filePath, newContent);
+    fileSystem.writeFileSync(filePath, updatedContent);
     log.info(`Updated YAML block with ID ${id}`);
     return true;
   } catch (e) {

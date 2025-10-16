@@ -10,7 +10,7 @@ import {
   IObservabilityLogger,
   ITask,
   ITaskRepository,
-  OperationContext,
+  IOperationContext,
   TaskProviderType,
   TaskState,
 } from '../types';
@@ -18,9 +18,9 @@ import {
 import { NextCommand } from './next.command';
 import { NextCommandTelemetry } from './next.command.telemetry';
 
-jest.mock('../../core/storage/task-provider.factory');
-jest.mock('../../core/processing/hydrate');
-jest.mock('../../core/system/observability-logger.adapter');
+jest.mock('../core/storage/task-provider.factory');
+jest.mock('../core/processing/hydrate');
+jest.mock('../core/system/observability-logger.adapter');
 jest.mock('./next.command.telemetry');
 
 describe('NextCommand', () => {
@@ -99,7 +99,7 @@ describe('NextCommand', () => {
   describe('execute', () => {
     it('should handle no task found', async () => {
       provider.findNextEligible.mockResolvedValue(null);
-      telemetry.recordStart.mockReturnValue({} as OperationContext);
+      telemetry.recordStart.mockReturnValue({} as IOperationContext);
 
       const command = new NextCommand(logger, observabilityLogger);
       await command.execute(options);
@@ -110,7 +110,7 @@ describe('NextCommand', () => {
 
     it('should hydrate and update task when found', async () => {
       provider.findNextEligible.mockResolvedValue(task);
-      telemetry.recordStart.mockReturnValue({} as OperationContext);
+      telemetry.recordStart.mockReturnValue({} as IOperationContext);
       hydrationService.hydrateTask.mockResolvedValue(task);
 
       const command = new NextCommand(logger, observabilityLogger);
@@ -129,7 +129,7 @@ describe('NextCommand', () => {
     it('should set dddKitCommit if pin is provided', async () => {
       options.pin = 'abc123';
       provider.findNextEligible.mockResolvedValue(task);
-      telemetry.recordStart.mockReturnValue({} as OperationContext);
+      telemetry.recordStart.mockReturnValue({} as IOperationContext);
       hydrationService.hydrateTask.mockResolvedValue(task);
 
       const command = new NextCommand(logger, observabilityLogger);
@@ -142,7 +142,7 @@ describe('NextCommand', () => {
 
     it('should throw error on failure', async () => {
       provider.findNextEligible.mockRejectedValue(new Error('Test error'));
-      telemetry.recordStart.mockReturnValue({} as OperationContext);
+      telemetry.recordStart.mockReturnValue({} as IOperationContext);
 
       const command = new NextCommand(logger, observabilityLogger);
       await expect(command.execute(options)).rejects.toThrow('Test error');

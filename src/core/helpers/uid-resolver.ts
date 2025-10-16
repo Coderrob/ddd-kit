@@ -11,6 +11,7 @@ export class Resolver implements IResolver {
   private registry: Record<string, IRegistryEntry | undefined> = {};
   private aliases: Record<string, string> = {};
   private readonly dddKitPath: string;
+  private readonly fileManager: FileManager;
 
   /**
    * Creates a new Resolver instance.
@@ -18,6 +19,7 @@ export class Resolver implements IResolver {
    */
   constructor(dddKitPath: string) {
     this.dddKitPath = dddKitPath;
+    this.fileManager = new FileManager();
     this.loadCatalogs();
   }
 
@@ -25,14 +27,13 @@ export class Resolver implements IResolver {
    * Loads the registry and aliases catalogs from the file system.
    */
   private loadCatalogs() {
-    const fileManager = new FileManager();
     const registryPath = path.join(this.dddKitPath, 'standards', 'catalogs', 'registry.json');
     const aliasesPath = path.join(this.dddKitPath, 'standards', 'catalogs', 'aliases.json');
-    if (fileManager.existsSync(registryPath)) {
-      this.registry = parseJsonFile(registryPath, fileManager) || {};
+    if (this.fileManager.existsSync(registryPath)) {
+      this.registry = parseJsonFile(registryPath, this.fileManager) || {};
     }
-    if (fileManager.existsSync(aliasesPath)) {
-      this.aliases = parseJsonFile(aliasesPath, fileManager) || {};
+    if (this.fileManager.existsSync(aliasesPath)) {
+      this.aliases = parseJsonFile(aliasesPath, this.fileManager) || {};
     }
   }
 
@@ -49,10 +50,10 @@ export class Resolver implements IResolver {
       return null;
     }
     const fullPath = path.join(this.dddKitPath, entry.path);
-    if (!FileManager.existsSync(fullPath)) {
+    if (!this.fileManager.existsSync(fullPath)) {
       return null;
     }
-    const content = FileManager.readFileSync(fullPath);
+    const content = this.fileManager.readFileSync(fullPath);
     return { content, path: entry.path, status: entry.status };
   }
 

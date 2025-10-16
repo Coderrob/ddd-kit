@@ -1,6 +1,5 @@
 import { TaskFixer } from '../core/fixers/task.fixer';
 import { ExclusionFilter } from '../core/processing/exclusion.filter';
-import { ILogger } from '../types/observability';
 import { IExclusionFilter } from '../types/repository';
 import { ITaskFixer, ITaskValidator } from '../types/tasks';
 import { IValidationResultBuilder } from '../types/validation';
@@ -27,7 +26,7 @@ export class ValidationFactory {
    * @param logger - The logger instance to use for logging fix operations.
    * @returns A configured ITaskFixer instance ready for applying automatic fixes.
    */
-  static createFixer(_logger: ILogger): ITaskFixer {
+  static createFixer(): ITaskFixer {
     return new TaskFixer();
   }
 

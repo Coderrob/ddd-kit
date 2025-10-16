@@ -33,16 +33,16 @@ jest.mock('chalk', () => ({
 }));
 
 // Mock all command modules
-jest.mock('../task-management/add-task.command');
-jest.mock('../task-management/complete-task.command');
-jest.mock('../task-management/list-tasks.command');
-jest.mock('../task-management/show-task.command');
-jest.mock('../validation/validate-and-fix.command');
-jest.mock('../validation/validate-tasks.command');
-jest.mock('../rendering/next.command');
-jest.mock('../rendering/render.command');
-jest.mock('../audit/ref-audit.command');
-jest.mock('../audit/supersede.command');
+jest.mock('./add-task.command');
+jest.mock('./complete-task.command');
+jest.mock('./list-tasks.command');
+jest.mock('./show-task.command');
+jest.mock('./validate-and-fix.command');
+jest.mock('./validate-tasks.command');
+jest.mock('./next.command');
+jest.mock('./render.command');
+jest.mock('./ref-audit.command');
+jest.mock('./supersede.command');
 
 // Import mocked command classes
 

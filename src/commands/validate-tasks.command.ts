@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 
 import { TaskManager } from '../core/storage';
-import { EXIT_CODES, ILogger } from '../types';
+import { EXIT_CODES, ILogger, CommandName } from '../types';
 import { validateTasks } from '../validators/validator';
 
 import { BaseCommand } from './base.command';
@@ -21,7 +21,7 @@ import { BaseCommand } from './base.command';
  * ```
  */
 export class ValidateTasksCommand extends BaseCommand {
-  override name = 'validate';
+  override name = CommandName.VALIDATE;
   override description = 'Validate all tasks';
 
   /**

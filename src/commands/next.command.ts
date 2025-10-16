@@ -15,7 +15,7 @@ import {
   ITask,
   ITaskRepository,
   NextCommandOptions,
-  OperationContext,
+  IOperationContext,
   TaskProviderType,
   TaskState,
 } from '../types';
@@ -68,7 +68,7 @@ export class NextCommand extends BaseCommand {
    * ```
    */
   async execute(options: IHydrationOptions): Promise<void> {
-    const op: OperationContext = this.telemetry.recordStart(this.observabilityLogger, options);
+    const op: IOperationContext = this.telemetry.recordStart(this.observabilityLogger, options);
 
     try {
       const provider = this.createProvider(options.provider ?? TaskProviderType.TASK);

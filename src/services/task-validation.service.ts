@@ -23,7 +23,7 @@ export class TaskValidationService {
     const context = new ValidationContext(tasks, options);
 
     const validator = ValidationFactory.createValidator();
-    const fixer = ValidationFactory.createFixer(context.getLogger());
+    const fixer = ValidationFactory.createFixer();
     const exclusionFilter = ValidationFactory.createExclusionFilter(options.excludePattern);
     const resultBuilder = ValidationFactory.createResultBuilder();
 
