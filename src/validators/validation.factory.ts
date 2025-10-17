@@ -1,13 +1,12 @@
-import { ILogger } from '../types/observability';
+import { TaskFixer } from '../core/fixers/task.fixer';
+import { ExclusionFilter } from '../core/processing/exclusion.filter';
 import { IExclusionFilter } from '../types/repository';
 import { ITaskFixer, ITaskValidator } from '../types/tasks';
 import { IValidationResultBuilder } from '../types/validation';
-import { TaskFixer } from '../core/fixers/task.fixer';
-import { ExclusionFilter } from '../core/processing/exclusion.filter';
 
+import { AjvValidator } from './ajv.validator';
 import { SchemaLoader } from './schema.loader';
 import { ValidationResultBuilder } from './validation-result.builder';
-import { AjvValidator } from './ajv.validator';
 
 /**
  * Factory for creating validation dependencies.
@@ -27,7 +26,7 @@ export class ValidationFactory {
    * @param logger - The logger instance to use for logging fix operations.
    * @returns A configured ITaskFixer instance ready for applying automatic fixes.
    */
-  static createFixer(_logger: ILogger): ITaskFixer {
+  static createFixer(): ITaskFixer {
     return new TaskFixer();
   }
 

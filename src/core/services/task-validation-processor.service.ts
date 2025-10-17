@@ -1,11 +1,10 @@
-import { ITask, ITaskValidator } from '../../types/tasks';
-import { IValidationResult, IValidationResultBuilder } from '../../types/validation';
+import { ITaskValidator, IValidationResultBuilder, ITask, IValidationResult } from '../../types';
 
 /**
  * Service responsible for task validation operations.
  * Follows Single Responsibility Principle (SRP).
  */
-export class TaskValidationService {
+export class TaskValidationProcessorService {
   constructor(
     private readonly validator: ITaskValidator,
     private readonly resultBuilder: IValidationResultBuilder,

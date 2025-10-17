@@ -1,8 +1,8 @@
 import * as path from 'path';
 
 import { IRenderer, IResolvedRef } from '../../types';
+import { isNonEmptyString } from '../helpers/type.helper';
 import { FileManager } from '../storage/file-manager';
-import { isNullOrUndefined, isNonEmptyString } from '../helpers/type-guards';
 
 export class Renderer implements IRenderer {
   private readonly targetPath: string;
@@ -11,6 +11,13 @@ export class Renderer implements IRenderer {
     this.targetPath = targetPath;
   }
 
+  /**
+   * Renders resolved references into the target repository.
+   * Creates/updates files under .development/feature-<taskId>/implementation-notes.md
+   * @param taskId The ID of the task being processed.
+   * @param resolvedRefs The array of resolved references to render.
+   * @param provenance Information about the source of the references.
+   */
   render(
     taskId: string,
     resolvedRefs: IResolvedRef[],
@@ -48,23 +55,69 @@ ${this.extractSection(ref.content, ref.section)}
     FileManager.writeFileSync(notesPath, content);
   }
 
+  /**
+   * Extracts the relevant section from the content if specified.
+   * If no section is specified, returns the full content without front-matter.
+   * @param content The full markdown content.
+   * @param section Optional section to extract.
+   * @returns The extracted section or full content without front-matter.
+   */
   private extractSection(content: string, section?: string): string {
-    // Strip front-matter
-    const stripped = content.replace(/^---\n[\s\S]*?\n---\n/, '');
-    if (isNullOrUndefined(section)) return stripped;
-    // Simple extraction, assume ## section
-    const lines = stripped.split('\n');
-    const start = lines.findIndex((l) => l.startsWith(`## ${section}`));
-    if (start === -1) return stripped;
-    let end = lines.length;
-    for (let i = start + 1; i < lines.length; i++) {
+    const strippedContent = this.stripFrontMatter(content);
+    if (section == null) return strippedContent;
+
+    return this.extractSpecificSection(strippedContent, section);
+  }
+
+  /**
+   * Strips front-matter from markdown content.
+   * @param content The markdown content.
+   * @returns Content without front-matter.
+   */
+  private stripFrontMatter(content: string): string {
+    return content.replace(/^---\n[\s\S]*?\n---\n/, '');
+  }
+
+  /**
+   * Extracts a specific section from content.
+   * @param content The markdown content.
+   * @param section The section to extract (e.g., "Implementation Notes").
+   * @returns The content of the specified section or the full content if not found.
+   */
+  private extractSpecificSection(content: string, section: string): string {
+    const lines = content.split('\n');
+    const sectionStart = this.findSectionStart(lines, section);
+
+    if (sectionStart === -1) return content;
+
+    const sectionEnd = this.findSectionEnd(lines, sectionStart);
+    return lines.slice(sectionStart, sectionEnd).join('\n');
+  }
+
+  /**
+   * Finds the starting line index of a section.
+   * @param lines The lines of the content.
+   * @param section The section to find (e.g., "Implementation Notes").
+   * @returns The index of the section start or -1 if not found.
+   */
+  private findSectionStart(lines: string[], section: string): number {
+    return lines.findIndex((line) => line.startsWith(`## ${section}`));
+  }
+
+  /**
+   * Finds the ending line index of a section.
+   * @param lines The lines of the content.
+   * @param startIndex The starting index of the section.
+   * @returns The index of the section end or the length of lines if not found.
+   */
+  private findSectionEnd(lines: string[], startIndex: number): number {
+    for (let i = startIndex + 1; i < lines.length; i++) {
       // eslint-disable-next-line security/detect-object-injection
       const line = lines[i];
       if (isNonEmptyString(line) && line.startsWith('## ')) {
-        end = i;
-        break;
+        return i;
       }
     }
-    return lines.slice(start, end).join('\n');
+    return lines.length;
   }
 }

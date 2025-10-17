@@ -1,11 +1,10 @@
-import { ILogger } from '../types/observability';
-import { ITask, ITaskStore } from '../types/tasks';
 import { TaskProcessor } from '../core/processing/task.processor';
+import { TaskPersistenceService } from '../core/services/task-persistence.service';
+import { TaskValidationProcessorService } from '../core/services/task-validation-processor.service';
+import { ITask, IValidationOptions } from '../types';
 import { ValidationContext } from '../validators/validation.context';
 import { ValidationFactory } from '../validators/validation.factory';
 import { ValidationResult } from '../validators/validation.result';
-import { TaskValidationService as TaskValidationProcessorService } from '../core/services/task-validation-processor.service';
-import { TaskPersistenceService } from '../core/services/task-persistence.service';
 
 /**
  * Main service for orchestrating task validation and fixing operations.
@@ -19,17 +18,12 @@ export class TaskValidationService {
    */
   async validateAndFixTasks(
     tasks: ITask[],
-    options: {
-      applyFixes: boolean;
-      excludePattern?: string;
-      store?: ITaskStore;
-      logger?: ILogger;
-    },
+    options: IValidationOptions,
   ): Promise<ValidationResult> {
     const context = new ValidationContext(tasks, options);
 
     const validator = ValidationFactory.createValidator();
-    const fixer = ValidationFactory.createFixer(context.getLogger());
+    const fixer = ValidationFactory.createFixer();
     const exclusionFilter = ValidationFactory.createExclusionFilter(options.excludePattern);
     const resultBuilder = ValidationFactory.createResultBuilder();
 

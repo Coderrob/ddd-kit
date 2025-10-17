@@ -1,5 +1,5 @@
-import { ITask } from './ITask';
 import { IHydrationOptions } from './IHydrationOptions';
+import { ITask } from './ITask';
 
 /**
  * Use case for hydrating the next eligible task.

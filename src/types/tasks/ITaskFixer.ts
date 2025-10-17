@@ -1,5 +1,5 @@
-import type { FixRecord } from './FixRecord';
 import { ITask } from './ITask';
+import { TaskFixResult } from './TaskFixResult';
 
 /**
  * Interface for automatically fixing common task validation issues.
@@ -27,7 +27,7 @@ export interface ITaskFixer {
    * dates, normalizing status values, or adding required default fields.
    *
    * @param task - The task object to analyze and fix
-   * @returns Array of FixRecord objects describing what fixes were applied
+   * @returns Object containing the fixed task and array of FixRecord objects describing what fixes were applied
    *
    * @example
    * ```typescript
@@ -37,12 +37,10 @@ export interface ITaskFixer {
    *   priority: '', // Empty string should be null
    * };
    *
-   * const fixes = fixer.applyBasicFixes(brokenTask);
-   * // fixes might include:
-   * // - Trimmed whitespace from title
-   * // - Normalized status to 'pending'
-   * // - Set priority to null
+   * const result = fixer.applyBasicFixes(brokenTask);
+   * // result.fixedTask has the corrected task
+   * // result.fixes contains descriptions of applied fixes
    * ```
    */
-  applyBasicFixes(task: ITask): FixRecord[];
+  applyBasicFixes(task: ITask): TaskFixResult;
 }

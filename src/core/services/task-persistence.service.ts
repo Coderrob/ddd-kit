@@ -1,5 +1,4 @@
-import { ITaskStore, ITask } from '../../types/tasks';
-import { ILogger } from '../../types/observability';
+import { ITaskStore, ILogger, ITask } from '../../types';
 
 /**
  * Service responsible for persisting task changes.

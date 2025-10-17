@@ -13,6 +13,7 @@ export * from './TaskStatus';
 export * from './TaskProviderType';
 export * from './IFixerOptions';
 export * from './FixRecord';
+export * from './TaskFixResult';
 
 // Todo command types (task-specific commands)
 export * from './AddTaskArgs';

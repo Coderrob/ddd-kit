@@ -2,10 +2,11 @@
 import { Command } from 'commander';
 import pino from 'pino';
 
+import { ConsoleOutputWriter } from './core/rendering/console-output.writer';
 import { getLogger } from './core/system/logger';
 import { ObservabilityLogger } from './core/system/observability.logger';
-import { CommandFactory } from './commands/shared/command.factory';
-import { EXIT_CODES } from './constants/exit-codes';
+import { EXIT_CODES } from './types/core';
+import { CommandFactory } from './commands/command.factory';
 
 /**
  * Main CLI entry point for the Documentation-Driven Development toolkit.
@@ -36,8 +37,11 @@ const observabilityLogger = new ObservabilityLogger(pinoLogger);
 const program = new Command();
 program.name('dddctl').description('Documentation-Driven Development CLI').version('1.0.0');
 
+// Create output writer for CLI messaging
+const outputWriter = new ConsoleOutputWriter();
+
 // Configure all commands through the factory
-CommandFactory.configureProgram(program, baseLogger);
+CommandFactory.configureProgram(program, baseLogger, outputWriter);
 
 // Helper function to get safe command name
 function getCommandName(): string {

@@ -3,4 +3,5 @@ dist
 .docusaurus
 .coverage
 test/validator.test.js
+__mocks__
 

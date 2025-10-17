@@ -1,8 +1,8 @@
-import { ITaskFixer, IExclusionFilter, IValidationResultBuilder, ITask } from '../../types';
+import { IExclusionFilter, ITask, ITaskFixer, IValidationResultBuilder } from '../../types';
 import { ValidationContext } from '../../validators/validation.context';
-import { isTask } from '../helpers/type-guards';
+import { isTask } from '../helpers/type.helper';
 import { TaskPersistenceService } from '../services/task-persistence.service';
-import { TaskValidationService } from '../services/task-validation-processor.service';
+import { TaskValidationProcessorService } from '../services/task-validation-processor.service';
 
 export class TaskProcessor {
   /**
@@ -15,7 +15,7 @@ export class TaskProcessor {
       exclusionFilter: IExclusionFilter;
       resultBuilder: IValidationResultBuilder;
       context: ValidationContext;
-      validationService: TaskValidationService;
+      validationService: TaskValidationProcessorService;
       persistenceService: TaskPersistenceService;
     },
   ) {}
@@ -82,7 +82,11 @@ export class TaskProcessor {
    * ```
    */
   private async applyFixes(taskObj: ITask, taskId: string, index: number): Promise<void> {
-    const localFixes = this.options.fixer.applyBasicFixes(taskObj);
+    const result = this.options.fixer.applyBasicFixes(taskObj);
+    const { fixedTask, fixes: localFixes } = result;
+
+    // Update the task object with the fixed version
+    Object.assign(taskObj, fixedTask);
 
     if (localFixes.length > 0) {
       this.options.resultBuilder.addFixes(localFixes);

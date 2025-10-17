@@ -1,9 +1,9 @@
-import { FixRecord, IFixerOptions, ITask } from '../../types/tasks';
+import { FixRecord, IFixerOptions, ITask, TaskFixResult } from '../../types/tasks';
 
-import { fixPriority } from './priority.fixer';
-import { fixStatus } from './status.fixer';
 import { fixDateField } from './dates.fixer';
 import { fixOwner } from './owner.fixer';
+import { fixPriority } from './priority.fixer';
+import { fixStatus } from './status.fixer';
 
 /**
  * Class responsible for applying automatic fixes to task objects that have validation issues.
@@ -22,19 +22,32 @@ export class TaskFixer {
 
   /**
    * Applies basic automatic fixes to common validation issues in a task object.
-   * @param asObj - The task object to fix (as a record).
-   * @returns An array of FixRecord objects describing the fixes applied.
+   * @param task - The original task object (not modified).
+   * @returns An object containing the fixed task and an array of FixRecord objects describing the fixes applied.
    */
-  applyBasicFixes(asObj: ITask): FixRecord[] {
+  applyBasicFixes(task: ITask): TaskFixResult {
     const fixes: FixRecord[] = [];
-    const id = String(asObj.id);
+    const id = String(task.id);
 
-    fixPriority(asObj, fixes, id);
-    fixStatus(asObj, fixes, id);
-    fixDateField({ nowIso: this.nowIso, asObj, field: 'created', fixes, id });
-    fixDateField({ nowIso: this.nowIso, asObj, field: 'updated', fixes, id });
-    fixOwner(asObj, fixes, id);
+    // Chain the immutable fixes
+    let fixedTask = fixPriority(task, fixes, id);
+    fixedTask = fixStatus(fixedTask, fixes, id);
+    fixedTask = fixDateField({
+      nowIso: this.nowIso,
+      task: fixedTask,
+      field: 'created',
+      fixes,
+      id,
+    });
+    fixedTask = fixDateField({
+      nowIso: this.nowIso,
+      task: fixedTask,
+      field: 'updated',
+      fixes,
+      id,
+    });
+    fixedTask = fixOwner(fixedTask, fixes, id);
 
-    return fixes;
+    return { fixedTask, fixes };
   }
 }

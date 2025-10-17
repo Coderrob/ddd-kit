@@ -1,4 +1,4 @@
-import { IValidationResultBuilder, FixRecord } from '../types';
+import { FixRecord, IValidationResultBuilder } from '../types';
 
 import { ValidationResult } from './validation.result';
 
