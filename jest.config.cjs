@@ -39,4 +39,5 @@ module.exports = {
   moduleNameMapper: {
     '^chalk$': '<rootDir>/__mocks__/chalk.js',
   },
+  forceExit: true,
 };

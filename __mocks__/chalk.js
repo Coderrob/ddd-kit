@@ -1,4 +1,4 @@
-const chalk = {
+const chalk = Object.assign((text) => text, {
   green: (text) => text,
   red: (text) => text,
   yellow: (text) => text,
@@ -38,6 +38,6 @@ const chalk = {
   inverse: (text) => text,
   strikethrough: (text) => text,
   reset: (text) => text,
-};
+});
 
 module.exports = chalk;
